@@ -1,14 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Movies</title>
-</head>
-<body>
-<ol>
+{% extends "movies/base.html" %}
+{% block content %}
+<div class="container">
+  <ol class="list-group">
+  <h1>Movies</h1>
 {% for movie in movies %}
-  <li>{{ movie.title}}</li>
+  <li class="list-group-item">{{ movie.title}}</li>
 {% endfor %}
 </ol>
-</body>
-</html>
+</div>
+{% endblock %}

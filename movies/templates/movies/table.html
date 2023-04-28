@@ -1,0 +1,10 @@
+{% extends "movies/base.html" %}
+{% block head %}
+  {% include "tables_pro/block_head.html" %}
+{% endblock %}
+{% block content %}
+  <div class="container">
+    <h3 class="text-center">{{ view.title }}</h3>
+    {% include "tables_pro/block_content.html" %}
+  </div>
+{% endblock %}

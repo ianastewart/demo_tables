@@ -24,7 +24,8 @@
                 {% else %}
                   <button class="dropdown-item {% if action.2 %}js-action{% endif %}" type="submit"
                           name="{{ action.0 }}"
-                          {% if action.2 %}action="{{ action.2 }}"{% endif %}>{{ action.1 }}</button>
+                          {% if action.2 %}action="{{ action.2 }}"{% endif %}>{{ action.1 }}
+                  </button>
                 {% endif %}
               {% endfor %}
             </div>

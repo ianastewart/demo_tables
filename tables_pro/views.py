@@ -5,7 +5,11 @@ from django.http import QueryDict, HttpResponse
 from django.shortcuts import render, reverse
 from django.urls.resolvers import NoReverseMatch
 from django_filters.views import FilterView
-from django_htmx.http import HttpResponseClientRefresh, HttpResponseClientRedirect, trigger_client_event
+from django_htmx.http import (
+    HttpResponseClientRefresh,
+    HttpResponseClientRedirect,
+    trigger_client_event,
+)
 from django_tables2 import SingleTableMixin
 from django_tables2.export.export import TableExport
 
@@ -20,7 +24,7 @@ from tables_pro.utils import (
 logger = logging.getLogger(__name__)
 
 
-class TablesPlusView(SingleTableMixin, FilterView):
+class TablesProView(SingleTableMixin, FilterView):
     class FilterStyle(IntEnum):
         NONE = 0
         TOOLBAR = 1
@@ -28,13 +32,13 @@ class TablesPlusView(SingleTableMixin, FilterView):
         HEADER = 3
 
     title = ""
-    template_name = "tables_pro/table.html"
+    template_name = "tables_pro/tables_pro.html"
     filter_template_name = "tables_pro/modal_filter.html"
     table_data_template_name = "tables_pro/render_table_data.html"
     rows_template_name = "tables_pro/render_rows.html"
 
     context_filter_name = "filter"
-    table_pagination = {"per_page": 25}
+    table_pagination = {"per_page": 10}
     infinite_scroll = False
     infinite_load = False
     #
@@ -42,7 +46,7 @@ class TablesPlusView(SingleTableMixin, FilterView):
     filter_button = False  # only relevant for TOOLBAR style
     #
     column_settings = False
-    row_settings = True
+    row_settings = False
     #
     click_method = "get"
     click_url_name = ""
@@ -82,19 +86,32 @@ class TablesPlusView(SingleTableMixin, FilterView):
                 elif subset == "all":
                     filterset_class = self.get_filterset_class()
                     filterset = self.get_filterset(filterset_class)
-                    if not filterset.is_bound or filterset.is_valid() or not self.get_strict():
+                    if (
+                        not filterset.is_bound
+                        or filterset.is_valid()
+                        or not self.get_strict()
+                    ):
                         qs = filterset.qs
             return self.export(request, query_set=qs)
         return super().get(request, *args, **kwargs)
 
-    def export(self, request, filename="Export", export_format="csv", query_set=None, all_columns=False):
+    def export(
+        self,
+        request,
+        filename="Export",
+        export_format="csv",
+        query_set=None,
+        all_columns=False,
+    ):
         """Use tablib to export in desired format"""
         self.object_list = query_set
         table = self.get_table()
         exclude_columns = []
         if not all_columns:
             table.before_render(request)
-            exclude_columns = [k for k, v in table.columns.columns.items() if not v.visible]
+            exclude_columns = [
+                k for k, v in table.columns.columns.items() if not v.visible
+            ]
         exclude_columns.append("selection")
         exporter = self.export_class(
             export_format=export_format,
@@ -124,7 +141,9 @@ class TablesPlusView(SingleTableMixin, FilterView):
             actions=self.get_actions(),
             columns=self.column_states(self.request),
             rows=self.rows_list(),
-            per_page=self.request.GET.get("per_page", self.table_pagination.get("per_page", 25)),
+            per_page=self.request.GET.get(
+                "per_page", self.table_pagination.get("per_page", 25)
+            ),
             default=True,
         )
         return context
@@ -135,7 +154,9 @@ class TablesPlusView(SingleTableMixin, FilterView):
                 bits = request.htmx.target.split("_")
                 return self.cell_changed(
                     record_pk=bits[1],
-                    column_name=visible_columns(request, self.table_class)[int(bits[2])],
+                    column_name=visible_columns(request, self.table_class)[
+                        int(bits[2])
+                    ],
                     target=request.htmx.target,
                 )
 
@@ -150,11 +171,15 @@ class TablesPlusView(SingleTableMixin, FilterView):
         # It's an action performed on a queryset`
         if "select_all" in request.POST:
             subset = "all"
-            self.selected_objects = self.filtered_query_set(request, request.htmx.current_url)
+            self.selected_objects = self.filtered_query_set(
+                request, request.htmx.current_url
+            )
         else:
             subset = "selected"
             request.session["selected_ids"] = request.POST.getlist("select-checkbox")
-            self.selected_objects = self.get_queryset().filter(pk__in=request.POST.getlist("select-checkbox"))
+            self.selected_objects = self.get_queryset().filter(
+                pk__in=request.POST.getlist("select-checkbox")
+            )
 
         if "export" in request.POST:
             # Export is a special case which must redirect to a GET with parameters
@@ -162,7 +187,9 @@ class TablesPlusView(SingleTableMixin, FilterView):
             if len(request.POST["query"]) > 1:
                 path += "&"
             export_format = self.get_export_format()
-            return HttpResponseClientRedirect(f"{path}_export={export_format}&_subset={subset}")
+            return HttpResponseClientRedirect(
+                f"{path}_export={export_format}&_subset={subset}"
+            )
 
         response = self.handle_action(request)
         return response if response else HttpResponseClientRefresh()
@@ -260,7 +287,11 @@ class TablesPlusView(SingleTableMixin, FilterView):
             if "_scroll" in request.GET:
                 return self.render_template(self.rows_template_name, *args, **kwargs)
 
-            return self.row_clicked(request.htmx.trigger.split("_")[1], request.htmx.target, request.htmx.current_url)
+            return self.row_clicked(
+                request.htmx.trigger.split("_")[1],
+                request.htmx.target,
+                request.htmx.current_url,
+            )
 
         elif "td_" in request.htmx.trigger:
             # cell clicked
@@ -274,7 +305,9 @@ class TablesPlusView(SingleTableMixin, FilterView):
         elif "id_" in request.htmx.trigger:
             # filter value changed
             url = self._update_parameter(
-                request, request.htmx.trigger_name, request.GET.get(request.htmx.trigger_name, "")
+                request,
+                request.htmx.trigger_name,
+                request.GET.get(request.htmx.trigger_name, ""),
             )
             return HttpResponseClientRedirect(url)
 
@@ -300,7 +333,11 @@ class TablesPlusView(SingleTableMixin, FilterView):
                 except NoReverseMatch:
                     pass
         table.target = self.click_target
-        editable = table.Meta.editable_columns if hasattr(table.Meta, "editable_columns") else []
+        editable = (
+            table.Meta.editable_columns
+            if hasattr(table.Meta, "editable_columns")
+            else []
+        )
         # set columns visbility
         columns = load_columns(self.request, table)
         if not columns:
@@ -314,7 +351,11 @@ class TablesPlusView(SingleTableMixin, FilterView):
                 table.columns.show(k) if k in columns else table.columns.hide(k)
         # build a string containing the numbers of visible editable columns
         visible = [col for col in table.sequence if col in columns]
-        editable = table.Meta.editable_columns if hasattr(table.Meta, "editable_columns") else []
+        editable = (
+            table.Meta.editable_columns
+            if hasattr(table.Meta, "editable_columns")
+            else []
+        )
         table.editable_columns = editable
         if table.filter:
             table.filter.style = self.filter_style
@@ -366,4 +407,6 @@ class ModalMixin:
 
     def reload_table(self):
         response = HttpResponse("")
-        return trigger_client_event(response, "reload", {"url": self.request.htmx.current_url_abs_path})
+        return trigger_client_event(
+            response, "reload", {"url": self.request.htmx.current_url_abs_path}
+        )
