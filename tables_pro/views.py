@@ -150,15 +150,16 @@ class TablesProView(SingleTableMixin, FilterView):
 
     def post(self, request, *args, **kwargs):
         if request.htmx:
-            if "td_" in request.htmx.target:
-                bits = request.htmx.target.split("_")
-                return self.cell_changed(
-                    record_pk=bits[1],
-                    column_name=visible_columns(request, self.table_class)[
-                        int(bits[2])
-                    ],
-                    target=request.htmx.target,
-                )
+            if request.htmx.target:
+                if "td_" in request.htmx.target:
+                    bits = request.htmx.target.split("_")
+                    return self.cell_changed(
+                        record_pk=bits[1],
+                        column_name=visible_columns(request, self.table_class)[
+                            int(bits[2])
+                        ],
+                        target=request.htmx.target,
+                    )
 
         if "columns_save" in request.POST:
             column_list = []
@@ -318,6 +319,7 @@ class TablesProView(SingleTableMixin, FilterView):
         table.filter = _filter
         table.infinite_scroll = self.infinite_scroll
         table.infinite_load = self.infinite_load
+        table.sticky_header = self.sticky_header
         table.method = self.click_method
         table.url = ""
         table.pk = False
@@ -368,6 +370,14 @@ class TablesProView(SingleTableMixin, FilterView):
                             table.header_fields.append(table.filter.form[key])
                         else:
                             table.header_fields.append(None)
+        # if self.sticky_header:
+        #     thead_attrs = table.Meta.attrs.get("thead", None)
+        #     if thead_attrs:
+        #         thead_class = thead_attrs.get("class", None)
+        #         if thead_class:
+        #             for col in table.columns.columns.values():
+        #                 th_class = col.attrs["th"].get("class", "")
+        #                 col.attrs["th"]["class"] = th_class + f" {thead_class}"
 
     def render_template(self, template_name, *args, **kwargs):
         saved = self.template_name

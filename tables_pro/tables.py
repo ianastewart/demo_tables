@@ -4,28 +4,6 @@ from django.contrib.humanize.templatetags.humanize import intcomma
 from tables_pro.utils import load_columns, save_columns
 
 
-class Table(tables.Table):
-    pass
-    # def before_render(self, request):
-    #     columns = load_columns(request, self)
-    #     if not columns:
-    #         if hasattr(self.Meta, "default_columns"):
-    #             columns = self.Meta.default_columns
-    #         else:
-    #             columns = self.base_columns
-    #         save_columns(request, columns)
-    #     for k, v in self.base_columns.items():
-    #         if v.verbose_name:
-    #             self.columns.show(k) if k in columns else self.columns.hide(k)
-    #
-    # def get_excluded_columns(self):
-    #     excluded = []
-    #     for k, v in self.columns.columns.items():
-    #         if not v.visible:
-    #             excluded.append(k)
-    #     return excluded
-
-
 class RightAlignedColumn(tables.Column):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -33,7 +11,7 @@ class RightAlignedColumn(tables.Column):
             self.attrs["th"] = {}
         if not "td" in self.attrs:
             self.attrs["td"] = {}
-        self.attrs["th"]["style"] = "text-align: center;"
+        self.attrs["th"]["style"] = "text-align: right;"
         self.attrs["td"]["style"] = "text-align: right;"
 
 

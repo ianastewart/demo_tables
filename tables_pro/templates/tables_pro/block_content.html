@@ -7,11 +7,13 @@
   {% csrf_token %}
   {% if actions or buttons or columns or view.filter_class and view.filter_modal %}
     <div class="{{ css_toolbar }}">
-      {% include "tables_pro/action_toolbar.html" %}
+      {% include "tables_pro/toolbar/main.html" %}
     </div>
   {% endif %}
   <div id="table_data" class="{{ css_table }}">
+    <div class="container">
     {% include "tables_pro/render_table_data.html" %}
+    </div>
   </div>
 </form>
 <div id="modals-here"></div>

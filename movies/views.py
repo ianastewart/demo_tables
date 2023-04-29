@@ -30,6 +30,7 @@ class MoviesTable2View(TablesProView):
     model = Movie
     row_settings = True
     column_settings = True
+    sticky_header = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -44,5 +45,11 @@ class MoviesTable3View(TablesProView):
     template_name = "movies/table.html"
     model = Movie
 
+
     def get_actions(self):
-        return (("action_1", "Action number 1"), ("action_2", "Action number 2"))
+        return (("custom", "Custom action"), ("export", "Export"))
+
+    def handle_action(self, request):
+        if "custom" in request.POST:
+            context = {"selected": self.selected_objects}
+            return render(request, "movies/custom_action.html", context)
