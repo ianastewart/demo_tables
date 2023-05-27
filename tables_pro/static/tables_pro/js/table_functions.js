@@ -144,7 +144,9 @@ var tableFunctions = (function () {
       });
       let count = checked.length;
       let countField = document.getElementById('count');
-      countField.innerText = count.toString();
+      if (countField) {
+        countField.innerText = count.toString();
+      }
       let actionMenu = document.getElementById('selectActionMenu');
       if (actionMenu) {
         actionMenu.disabled = (count === 0);

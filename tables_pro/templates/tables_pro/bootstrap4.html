@@ -62,7 +62,9 @@
       </table>
     {% endblock table %}
     {% block pagination %}
+      {% if not table.infinite_scroll and not table.infinite_load %}
       {% include "tables_pro/paginator.html" %}
+      {% endif %}
     {% endblock pagination %}
   </div>
 {% endblock table-wrapper %}

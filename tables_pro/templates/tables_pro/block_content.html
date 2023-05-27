@@ -1,11 +1,11 @@
-{% if view.filterset_class and view.filter_row %}
+{% if view.filterset_class and view.filter_style == 1 %}
   <div class="{{ css_toolbar }}">
     {% include "tables_pro/filter_toolbar.html" %}
   </div>
 {% endif %}
 <form hx-post="">
   {% csrf_token %}
-  {% if actions or buttons or columns or view.filter_class and view.filter_modal %}
+  {% if actions or buttons or columns or view.filterset_class and view.filter_modal %}
     <div class="{{ css_toolbar }}">
       {% include "tables_pro/toolbar/main.html" %}
     </div>

@@ -4,6 +4,7 @@ from django.views.generic import ListView
 from .models import Movie
 from tables_pro.views import TablesProView
 from .tables import MovieTable1, MovieTable3
+from .filters import MovieFilter
 
 
 class MoviesListView(ListView):
@@ -45,7 +46,6 @@ class MoviesTable3View(TablesProView):
     template_name = "movies/table.html"
     model = Movie
 
-
     def get_actions(self):
         return (("custom", "Custom action"), ("export", "Export"))
 
@@ -53,3 +53,27 @@ class MoviesTable3View(TablesProView):
         if "custom" in request.POST:
             context = {"selected": self.selected_objects}
             return render(request, "movies/custom_action.html", context)
+
+
+class MoviesTable4View(TablesProView):
+    title = "Infinite scroll"
+    table_class = MovieTable1
+    template_name = "movies/table.html"
+    model = Movie
+    infinite_scroll = True
+
+
+class MoviesTable5View(TablesProView):
+    title = "Infinite load more"
+    table_class = MovieTable1
+    template_name = "movies/table.html"
+    model = Movie
+    infinite_load = True
+
+
+class MoviesTable6View(TablesProView):
+    title = "Filter toolbar"
+    table_class = MovieTable1
+    filterset_class = MovieFilter
+    template_name = "movies/table.html"
+    model = Movie
