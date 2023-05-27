@@ -1,3 +1,4 @@
+-- https://github.com/bbrumm/databasestar/tree/main/sample_databases/sample_db_movies
 drop table movies_movie;
 create table movies_movie
 (
