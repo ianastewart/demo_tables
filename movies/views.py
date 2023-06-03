@@ -3,7 +3,7 @@ from django.shortcuts import render, reverse
 from django.views.generic import ListView, TemplateView
 from django_htmx.http import HttpResponseClientRedirect
 from .models import Movie
-from tables_pro.views import TablesProView
+from tables_pro.views import TablesProView, SelectedMixin
 from .tables import MovieTable1, MovieTable3
 from .filters import MovieFilter
 
@@ -51,30 +51,31 @@ class MoviesTable3View(TablesProView):
         return (
             ("action", "Invisible action"),
             ("action_modal", "Modal action"),
-            ("action_page", "Page action"),
+            ("action_page", "Action on a new page"),
             ("export", "Export"),
         )
 
-    def handle_action(self, request):
-        if "action" in request.POST:
+    def handle_action(self, request, action):
+        if action == "action":
             # do something
             return None
-        elif "action_modal" in request.POST:
+        elif action == "action_modal":
             context = {"selected": self.selected_objects}
             return render(request, "movies/action_modal.html", context)
-        elif "action_page" in request.POST:
+        elif action == "action_page":
             request.session["selected_ids"] = self.selected_ids
-            return HttpResponseClientRedirect(reverse("action_page"))
+            path = reverse("action_page") + request.POST["query"]
+            return HttpResponseClientRedirect(path)
 
 
-class ActionPageView(TemplateView):
+class ActionPageView(SelectedMixin, TemplateView):
+    model = Movie
+    filterset_class = MovieFilter
     template_name = "movies/action_page.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["movies"] = Movie.objects.filter(
-            id__in=self.request.session.get("selected_ids", [])
-        )
+        context["movies"] = self.get_query_set()
         return context
 
 
@@ -96,9 +97,9 @@ class MoviesTable5View(TablesProView):
     sticky_header = True
 
 
-class MoviesTable6View(TablesProView):
+class MoviesTable6View(MoviesTable3View):
     title = "Filter toolbar"
-    table_class = MovieTable1
+    table_class = MovieTable3
     filterset_class = MovieFilter
     filter_style = TablesProView.FilterStyle.MODAL
     template_name = "movies/table.html"

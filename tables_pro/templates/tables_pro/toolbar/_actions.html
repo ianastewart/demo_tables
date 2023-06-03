@@ -17,7 +17,7 @@
           </button>
           <div class="dropdown-menu">
             {% for action in actions %}
-                <button class="dropdown-item" type="submit" name="{{ action.0 }}">{{ action.1 }}</button>
+                <button class="dropdown-item" type="submit" name="{{ action.0 }}" hx-post>{{ action.1 }}</button>
             {% endfor %}
           </div>
         </div>

@@ -1,6 +1,11 @@
 // Handle checkboxes in tables, and modal forms
 'use strict';
+onload=function(){
+  alert("Loaded");
+}
+
 var tableFunctions = (function () {
+    alert("Init");
     let tb = {};
     let lastChecked = null;
 

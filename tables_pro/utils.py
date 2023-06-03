@@ -31,8 +31,9 @@ def set_column(request, table_class, column_name, checked):
         columns.remove(column_name)
     save_columns(request, columns)
 
+
 def visible_columns(request, table_class):
-    """ return list of visible columns in correct sequence """
+    """return list of visible columns in correct sequence"""
     sequence = table_class(data=[]).sequence
     columns = load_columns(request, table_class)
     return [col for col in sequence if col in columns]

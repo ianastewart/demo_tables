@@ -65,6 +65,7 @@ class TablesProView(SingleTableMixin, FilterView):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.table = None
         self.selected_objects = None
 
     def get_export_filename(self, export_format):
@@ -173,10 +174,11 @@ class TablesProView(SingleTableMixin, FilterView):
         if "select_all" in request.POST:
             subset = "all"
             self.selected_ids = []
-            self.selected_objects = self.filtered_query_set(
-                request, request.htmx.current_url
-            )
-
+            self.selected_objects = self.filtered_query_set(request)
+            # qd = self.query_dict(request)
+            # if "page" in qd:
+            #     del qd["page"]
+            # self.query_dict = qd
         else:
             subset = "selected"
             self.selected_ids = request.POST.getlist("select-checkbox")
@@ -194,27 +196,30 @@ class TablesProView(SingleTableMixin, FilterView):
                 f"{path}_export={export_format}&_subset={subset}"
             )
 
-        response = self.handle_action(request)
+        response = self.handle_action(request, request.htmx.trigger_name)
         return response if response else HttpResponseClientRefresh()
 
     def get_export_format(self):
         return self.export_format
 
-    def filtered_query_set(self, request, url, next=False):
+    def filtered_query_set(self, request, next=False):
         """Recreate the queryset used in GET for use in POST"""
         query_set = self.get_queryset()
-        parts = url.split("?")
-        if len(parts) == 2 and self.filterset_class:
-            qd = QueryDict(parts[1]).copy()
-            if next:
-                if "page" not in qd:
-                    qd["page"] = "2"
-                else:
-                    qd["page"] = str(int(qd["page"]) + 1)
-            return self.filterset_class(qd, queryset=query_set, request=request).qs
-        return query_set
+        qd = self.query_dict(request)
+        if next:
+            if "page" not in qd:
+                qd["page"] = "2"
+            else:
+                qd["page"] = str(int(qd["page"]) + 1)
+        return self.filterset_class(qd, queryset=query_set, request=request).qs
 
-    def handle_action(self, request):
+    def query_dict(self, request):
+        bits = request.htmx.current_url.split("?")
+        if len(bits) == 2:
+            return QueryDict(bits[1]).copy()
+        return QueryDict().copy()
+
+    def handle_action(self, request, action):
         """
         The action is in the request.POST dictionary
         self.selected_objects is a queryset that contains the objects to be processed
@@ -259,9 +264,6 @@ class TablesProView(SingleTableMixin, FilterView):
         elif request.htmx.trigger_name == "filter_form":
             # a filter value was changed
             return self.render_template(self.table_data_template_name, *args, **kwargs)
-        #
-        # elif request.htmx.trigger_name == "load_more":
-        #     return self.render_template(self.rows_template_name, *args, **kwargs)
 
         elif "id_col" in request.htmx.trigger:
             # click on column checkbox in dropdown re-renders the table with new column settings
@@ -343,7 +345,7 @@ class TablesProView(SingleTableMixin, FilterView):
             if hasattr(table.Meta, "editable_columns")
             else []
         )
-        # set columns visbility
+        # set columns visibility
         columns = load_columns(self.request, table)
         if not columns:
             if hasattr(table.Meta, "default_columns"):
@@ -394,6 +396,31 @@ class TablesProView(SingleTableMixin, FilterView):
         query_dict = request.GET.copy()
         query_dict[key] = value
         return f"{request.path}?{query_dict.urlencode()}"
+
+
+class SelectedMixin:
+    """
+    Use in views that are called to perform an action on selected objects.
+    Selected objects can be obtained from a list of ids passed in the session,
+    or from a query passed as GET parameters.
+    Returns a queryset of the selected objects
+    """
+
+    model = None
+    filterset_class = None
+
+    def get_query_set(self):
+        if self.model is None:
+            raise ValueError("Model must be specified for SelectedMixin")
+        ids = self.request.session.get("selected_ids", [])
+        if ids:
+            return self.model.objects.filter(id__in=ids)
+        query_set = self.model.objects.all()
+        if self.filterset_class:
+            return self.filterset_class(
+                self.request.GET, queryset=query_set, request=self.request
+            ).qs
+        return query_set
 
 
 class ModalMixin:
