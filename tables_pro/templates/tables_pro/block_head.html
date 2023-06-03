@@ -1,4 +1,3 @@
-{% block head %}
   <style>
     {% if view.sticky_header %}
         thead {
@@ -16,5 +15,17 @@
         content: '\0000a0\0025bc';
         float: right;
     }
+@media screen and (max-width: 600px) {
+    table {width:100%}
+    thead {display: none;}
+    tr:nth-of-type(2n) {background-color: inherit;}
+    tr td:first-child {background: #f0f0f0; font-weight:bold; font-size: 1.3em;}
+    tbody td {display: block; text-align:center;}
+    tbody td:before {
+        content: attr(label);
+        display: block;
+        text-align: center;
+    }
+}
+
   </style>
-{% endblock %}

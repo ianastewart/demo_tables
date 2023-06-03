@@ -172,12 +172,14 @@ class TablesProView(SingleTableMixin, FilterView):
         # It's an action performed on a queryset`
         if "select_all" in request.POST:
             subset = "all"
+            self.selected_ids = []
             self.selected_objects = self.filtered_query_set(
                 request, request.htmx.current_url
             )
+
         else:
             subset = "selected"
-            request.session["selected_ids"] = request.POST.getlist("select-checkbox")
+            self.selected_ids = request.POST.getlist("select-checkbox")
             self.selected_objects = self.get_queryset().filter(
                 pk__in=request.POST.getlist("select-checkbox")
             )
@@ -257,12 +259,12 @@ class TablesProView(SingleTableMixin, FilterView):
         elif request.htmx.trigger_name == "filter_form":
             # a filter value was changed
             return self.render_template(self.table_data_template_name, *args, **kwargs)
-
-        elif request.htmx.trigger_name == "load_more":
-            return self.render_template(self.rows_template_name, *args, **kwargs)
+        #
+        # elif request.htmx.trigger_name == "load_more":
+        #     return self.render_template(self.rows_template_name, *args, **kwargs)
 
         elif "id_col" in request.htmx.trigger:
-            # click on column checkbox in dropdown re-renders the table
+            # click on column checkbox in dropdown re-renders the table with new column settings
             col_name = request.htmx.trigger_name[4:]
             checked = request.htmx.trigger_name in request.GET
             set_column(request, self.table_class, col_name, checked)
@@ -285,6 +287,7 @@ class TablesProView(SingleTableMixin, FilterView):
             return HttpResponseClientRefresh()
 
         elif "tr_" in request.htmx.trigger:
+            # infinite scroll/load_more or click on row
             if "_scroll" in request.GET:
                 return self.render_template(self.rows_template_name, *args, **kwargs)
 

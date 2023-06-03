@@ -3,7 +3,7 @@
     {% include "tables_pro/filter_toolbar.html" %}
   </div>
 {% endif %}
-<form hx-post="">
+<form hx-post="" hx-target="#modals-here">
   {% csrf_token %}
   {% if actions or buttons or columns or view.filterset_class and view.filter_modal %}
     <div class="{{ css_toolbar }}">

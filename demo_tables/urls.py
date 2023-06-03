@@ -11,4 +11,5 @@ urlpatterns = [
     path("table4/", MoviesTable4View.as_view(), name="table4"),
     path("table5/", MoviesTable5View.as_view(), name="table5"),
     path("table6/", MoviesTable6View.as_view(), name="table6"),
+    path("action/", ActionPageView.as_view(), name="action_page"),
 ]
