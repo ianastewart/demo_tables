@@ -67,6 +67,7 @@ class TablesProView(SingleTableMixin, FilterView):
         super().__init__(**kwargs)
         self.table = None
         self.selected_objects = None
+        self.selected_ids = None
 
     def get_export_filename(self, export_format):
         return "{}.{}".format(self.export_name, export_format)
@@ -93,7 +94,27 @@ class TablesProView(SingleTableMixin, FilterView):
                         or not self.get_strict()
                     ):
                         qs = filterset.qs
-            return self.export(request, query_set=qs)
+            filename = "Export"
+            """Use tablib to export in desired format"""
+            self.object_list = qs
+            table = self.get_table()
+
+            exclude_columns = []
+            # if not all_columns:
+            #     table.before_render(request)
+            #     exclude_columns = [
+            #         k for k, v in table.columns.columns.items() if not v.visible
+            #     ]
+            exclude_columns.append("selection")
+            exporter = self.export_class(
+                export_format=export_format,
+                table=table,
+                exclude_columns=exclude_columns,
+                dataset_kwargs=self.get_dataset_kwargs(),
+            )
+            return exporter.response(filename=f"{filename}.{export_format}")
+
+        # return self.export(request, query_set=qs)
         return super().get(request, *args, **kwargs)
 
     def export(
@@ -175,23 +196,19 @@ class TablesProView(SingleTableMixin, FilterView):
             subset = "all"
             self.selected_ids = []
             self.selected_objects = self.filtered_query_set(request)
-            # qd = self.query_dict(request)
-            # if "page" in qd:
-            #     del qd["page"]
-            # self.query_dict = qd
         else:
             subset = "selected"
             self.selected_ids = request.POST.getlist("select-checkbox")
-            self.selected_objects = self.get_queryset().filter(
-                pk__in=request.POST.getlist("select-checkbox")
-            )
+            self.selected_objects = self.get_queryset().filter(pk__in=self.selected_ids)
 
-        if "export" in request.POST:
+        if "export" in request.htmx.trigger_name:
             # Export is a special case which must redirect to a GET with parameters
+            request.session["selected_ids"] = self.selected_ids
+            bits = request.htmx.trigger_name.split("_")
+            export_format = bits[1] if len(bits) > 1 else "csv"
             path = request.path + request.POST["query"]
             if len(request.POST["query"]) > 1:
                 path += "&"
-            export_format = self.get_export_format()
             return HttpResponseClientRedirect(
                 f"{path}_export={export_format}&_subset={subset}"
             )
@@ -221,8 +238,9 @@ class TablesProView(SingleTableMixin, FilterView):
 
     def handle_action(self, request, action):
         """
-        The action is in the request.POST dictionary
+        The action is also in the request.POST dictionary.
         self.selected_objects is a queryset that contains the objects to be processed
+        self.selected_ids is a list of model ids that were selected, empty for 'All rows'
         Possible return values:
         - None: (default) - reloads the last path
         - HttpResponse to be returned

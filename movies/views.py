@@ -52,7 +52,8 @@ class MoviesTable3View(TablesProView):
             ("action", "Invisible action"),
             ("action_modal", "Modal action"),
             ("action_page", "Action on a new page"),
-            ("export", "Export"),
+            ("export", "Export to csv"),
+            ("export_xlsx", "Export as xlsx")
         )
 
     def handle_action(self, request, action):
