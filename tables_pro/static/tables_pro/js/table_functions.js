@@ -2,18 +2,21 @@
 'use strict';
 var tableFunctions = (function () {
     let tb = {};
-    let lastChecked = null;
-    let selAll = document.getElementById('select_all')
-    let selAllPage = document.getElementById('select_all_page')
-
-        tb.init = function () {
+    console.log("Begin")
+    let lastChecked = null
+    let selAll = null
+    let selAllPage = null
+    tb.init = function(){
         window.addEventListener("load", onLoad)
+        selAll = document.getElementById('select_all')
+        selAllPage = document.getElementById('select_all_page')
         if (selAll) {
             selAll.addEventListener("click", selectAll)
         }
         if (selAllPage) {
             selAllPage.addEventListener("click", selectAllPage)
         }
+        // document.getElementById('select_all_page').addEventListener("click", selectAllPage )
         Array.from(document.getElementsByTagName("table")).forEach(e => e.addEventListener("click", tableClick));
         Array.from(document.querySelectorAll(".auto-submit")).forEach(e => e.addEventListener("change", function () {
             document.getElementById("id_table_form").submit()
@@ -23,28 +26,27 @@ var tableFunctions = (function () {
         document.body.addEventListener("trigger", function (evt) {
             htmx.ajax('GET', evt.detail.url, {source: '#table_data', 'target': '#table_data'});
         })
-        if (window.matchMedia("(max-width: 768px)").matches) {
-            setMobileTable("table")
-        }
+        // if (window.matchMedia("(max-width: 768px)").matches) {
+        //     setMobileTable("table")
+        // }
     }
 
     function onLoad() {
         countChecked();
-        if (selAll.checked) {
-            Array.from(document.getElementsByClassName("select-checkbox")).forEach(function (box) {
-                box.checked = true;
-                box.disabled = false;
-                highlightRow(box);
-            })
-            selAll.parentElement.style.display = 'block';
-        }
-
-        if (selAll.checked) {
-            document.getElementById('count').innerText = 'All';
-            document.getElementById('select_all_page').disabled = true;
-            Array.from(document.getElementsByClassName("select-checkbox")).forEach(function (box) {
-                box.disabled = true;
-            })
+        if (selAll) {
+            if (selAll.checked) {
+                Array.from(document.getElementsByClassName("select-checkbox")).forEach(function (box) {
+                    box.checked = true;
+                    box.disabled = false;
+                    highlightRow(box);
+                })
+                selAll.parentElement.style.display = 'block';
+                document.getElementById('count').innerText = 'All';
+                document.getElementById('select_all_page').disabled = true;
+                Array.from(document.getElementsByClassName("select-checkbox")).forEach(function (box) {
+                    box.disabled = true;
+                })
+            }
         }
     }
 
@@ -95,7 +97,7 @@ var tableFunctions = (function () {
         if (e.target.name === 'select-checkbox') {
             // Click on row's select checkbox - handle using shift to select multiple rows
             selAllPage.checked = false;
-            selAll.parentElement.style.display = 'none';
+            // selAll.parentElement.style.display = 'none';
             let chkBox = e.target;
             highlightRow(chkBox);
             if (!lastChecked) {
@@ -176,17 +178,20 @@ var tableFunctions = (function () {
         }
     }
 
-    function setMobileTable(selector) {
-        // if (window.innerWidth > 600) return false;
-        const tableEl = document.querySelector(selector);
-        const thEls = tableEl.querySelectorAll('thead th');
-        const tdLabels = Array.from(thEls).map(el => el.innerText);
-        tableEl.querySelectorAll('tbody tr').forEach(tr => {
-            Array.from(tr.children).forEach(
-                (td, ndx) => td.setAttribute('label', tdLabels[ndx])
-            );
-        });
-    }
+    // function windowSize():
+    // htmx
+
+    // function setMobileTable(selector) {
+    //     // if (window.innerWidth > 600) return false;
+    //     const tableEl = document.querySelector(selector);
+    //     const thEls = tableEl.querySelectorAll('thead th');
+    //     const tdLabels = Array.from(thEls).map(el => el.innerText);
+    //     tableEl.querySelectorAll('tbody tr').forEach(tr => {
+    //         Array.from(tr.children).forEach(
+    //             (td, ndx) => td.setAttribute('label', tdLabels[ndx])
+    //         );
+    //     });
+    // }
 
     return tb
 }

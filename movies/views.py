@@ -1,7 +1,8 @@
 from django.shortcuts import render, reverse
-
+from django.contrib import messages
 from django.views.generic import ListView, TemplateView
-from django_htmx.http import HttpResponseClientRedirect
+from django_htmx.http import HttpResponseClientRedirect, retarget
+from django.http import HttpResponse
 from .models import Movie
 from tables_pro.views import TablesProView, SelectedMixin
 from .tables import MovieTable1, MovieTable3
@@ -23,6 +24,7 @@ class MoviesTable1View(TablesProView):
     table_class = MovieTable1
     template_name = "movies/table.html"
     model = Movie
+    responsive = True
 
 
 class MoviesTable2View(TablesProView):
@@ -49,20 +51,26 @@ class MoviesTable3View(TablesProView):
 
     def get_actions(self):
         return (
-            ("action", "Invisible action"),
-            ("action_modal", "Modal action"),
+            ("action_message", "Action with message"),
+            ("action_modal", "Action in a modal"),
             ("action_page", "Action on a new page"),
             ("export", "Export to csv"),
-            ("export_xlsx", "Export as xlsx")
+            ("export_xlsx", "Export as xlsx"),
         )
 
     def handle_action(self, request, action):
-        if action == "action":
-            # do something
-            return None
+        if action == "action_message":
+            context = {
+                "message": f"Action on {self.selected_objects.count()} rows",
+                "alert_class": "alert-success",
+            }
+            response = render(request, "tables_pro/_alert.html", context)
+            return retarget(response, "#messages")
+
         elif action == "action_modal":
             context = {"selected": self.selected_objects}
             return render(request, "movies/action_modal.html", context)
+
         elif action == "action_page":
             request.session["selected_ids"] = self.selected_ids
             path = reverse("action_page") + request.POST["query"]
@@ -104,4 +112,7 @@ class MoviesTable6View(MoviesTable3View):
     filterset_class = MovieFilter
     filter_style = TablesProView.FilterStyle.MODAL
     template_name = "movies/table.html"
+    column_settings = True
+    row_settings = True
+    responsive = True
     model = Movie

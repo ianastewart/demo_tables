@@ -1,11 +1,3 @@
 {% load render_table from django_tables2 %}
 {% load static %}
 {% render_table table "tables_pro/bootstrap4.html" %}
-<script src="{% static "tables_pro/js/table_functions.js" %}"></script>
-<script>tableFunctions.init();
-
-    function onLoad(){
-      alert("onLoad");
-    }
-
-</script>

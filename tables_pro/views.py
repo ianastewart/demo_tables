@@ -8,6 +8,7 @@ from django_filters.views import FilterView
 from django_htmx.http import (
     HttpResponseClientRefresh,
     HttpResponseClientRedirect,
+    retarget,
     trigger_client_event,
 )
 from django_tables2 import SingleTableMixin
@@ -98,13 +99,13 @@ class TablesProView(SingleTableMixin, FilterView):
             """Use tablib to export in desired format"""
             self.object_list = qs
             table = self.get_table()
-
+            self.preprocess_table(table)
             exclude_columns = []
             # if not all_columns:
-            #     table.before_render(request)
-            #     exclude_columns = [
-            #         k for k, v in table.columns.columns.items() if not v.visible
-            #     ]
+            table.before_render(request)
+            exclude_columns = [
+                k for k, v in table.columns.columns.items() if not v.visible
+            ]
             exclude_columns.append("selection")
             exporter = self.export_class(
                 export_format=export_format,
@@ -113,35 +114,7 @@ class TablesProView(SingleTableMixin, FilterView):
                 dataset_kwargs=self.get_dataset_kwargs(),
             )
             return exporter.response(filename=f"{filename}.{export_format}")
-
-        # return self.export(request, query_set=qs)
         return super().get(request, *args, **kwargs)
-
-    def export(
-        self,
-        request,
-        filename="Export",
-        export_format="csv",
-        query_set=None,
-        all_columns=False,
-    ):
-        """Use tablib to export in desired format"""
-        self.object_list = query_set
-        table = self.get_table()
-        exclude_columns = []
-        if not all_columns:
-            table.before_render(request)
-            exclude_columns = [
-                k for k, v in table.columns.columns.items() if not v.visible
-            ]
-        exclude_columns.append("selection")
-        exporter = self.export_class(
-            export_format=export_format,
-            table=table,
-            exclude_columns=exclude_columns,
-            dataset_kwargs=self.get_dataset_kwargs(),
-        )
-        return exporter.response(filename=f"{filename}.{export_format}")
 
     def rows_list(self):
         return [10, 15, 20, 25, 50, 100]
@@ -167,6 +140,7 @@ class TablesProView(SingleTableMixin, FilterView):
                 "per_page", self.table_pagination.get("per_page", 25)
             ),
             default=True,
+            responsive=hasattr(self, "responsive"),
         )
         return context
 
@@ -202,7 +176,7 @@ class TablesProView(SingleTableMixin, FilterView):
             self.selected_objects = self.get_queryset().filter(pk__in=self.selected_ids)
 
         if "export" in request.htmx.trigger_name:
-            # Export is a special case which must redirect to a GET with parameters
+            # Export is a special case which must redirect to a regular GET that returns the file
             request.session["selected_ids"] = self.selected_ids
             bits = request.htmx.trigger_name.split("_")
             export_format = bits[1] if len(bits) > 1 else "csv"
@@ -239,7 +213,7 @@ class TablesProView(SingleTableMixin, FilterView):
     def handle_action(self, request, action):
         """
         The action is also in the request.POST dictionary.
-        self.selected_objects is a queryset that contains the objects to be processed
+        self.selected_objects is a queryset that contains the objects to be processed.
         self.selected_ids is a list of model ids that were selected, empty for 'All rows'
         Possible return values:
         - None: (default) - reloads the last path
@@ -270,7 +244,18 @@ class TablesProView(SingleTableMixin, FilterView):
 
     def get_htmx(self, request, *args, **kwargs):
 
-        if request.htmx.trigger == "table_data":
+        if request.htmx.trigger == "size_query":
+            # respond with appropriately sized table
+            self.filterset = self.get_filterset(self.get_filterset_class())
+            self.object_list = self.filterset.qs
+            context = self.get_context_data(
+                filter=self.filterset, object_list=self.object_list
+            )
+            context["responsive"] = False
+            response = render(request, "tables_pro/block_content.html", context)
+            return retarget(response, "#block_content")
+
+        elif request.htmx.trigger == "table_data":
             # triggered refresh of table data after create or update
             return self.render_template(self.table_data_template_name, *args, **kwargs)
 
@@ -337,7 +322,7 @@ class TablesProView(SingleTableMixin, FilterView):
 
         raise ValueError("Bad htmx get request")
 
-    def preprocess_table(self, table, _filter):
+    def preprocess_table(self, table, _filter=None):
         """Add extra attributes needed for rendering to the table"""
         table.filter = _filter
         table.infinite_scroll = self.infinite_scroll
@@ -358,11 +343,7 @@ class TablesProView(SingleTableMixin, FilterView):
                 except NoReverseMatch:
                     pass
         table.target = self.click_target
-        editable = (
-            table.Meta.editable_columns
-            if hasattr(table.Meta, "editable_columns")
-            else []
-        )
+
         # set columns visibility
         columns = load_columns(self.request, table)
         if not columns:
@@ -382,6 +363,7 @@ class TablesProView(SingleTableMixin, FilterView):
             else []
         )
         table.editable_columns = editable
+
         if table.filter:
             table.filter.style = self.filter_style
             if self.filter_style == self.FilterStyle.HEADER:

@@ -1,10 +1,14 @@
 {% extends "movies/base.html" %}
+{% load bootstrap4 %}
 {% block head %}
   {% include "tables_pro/block_head.html" %}
 {% endblock %}
 {% block content %}
   <div class="container">
     <h3 class="text-center">{{ view.title }}</h3>
+    <div id="messages">
+    {% bootstrap_messages %}
+    </div>
     {% include "tables_pro/block_content.html" %}
   </div>
 {% endblock %}
