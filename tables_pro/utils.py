@@ -14,12 +14,13 @@ def load_columns(request, table_class):
     key = f"columns:{_base_key(request)}"
     if key in request.session:
         return request.session[key]
-    if hasattr(table_class, "Meta") and hasattr(table_class.Meta, "default_columns"):
-        columns = table_class.Meta.default_columns
-    else:
-        columns = table_class.sequence
-    save_columns(request, columns)
-    return columns
+    return None
+    # if hasattr(table_class, "Meta") and hasattr(table_class.Meta, "default_columns"):
+    #     columns = table_class.Meta.default_columns
+    # else:
+    #     columns = table_class.sequence
+    # save_columns(request, columns)
+    # return columns
 
 
 def set_column(request, table_class, column_name, checked):

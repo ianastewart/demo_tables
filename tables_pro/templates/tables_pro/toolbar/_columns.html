@@ -11,7 +11,7 @@
       <a class="dropdown-item py-0" href="#" hx-get="" id="id_default">Default</a>
       <div class="dropdown-divider"></div>
     {% endif %}
-    {% for column in columns %}
+    {% for column in table.column_states %}
       <div class="form-check ml-2 ms-2">
         <input type="checkbox" class="form-check-input" name="col_{{ column.0 }}" id="id_col_{{ column.0 }}"
                hx-get="" name="xxx" {% if column.2 %} checked {% endif %}>

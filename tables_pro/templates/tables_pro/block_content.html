@@ -8,7 +8,7 @@
   {% endif %}
   <form hx-post="" hx-target="#modals-here">
     {% csrf_token %}
-    {% if actions or buttons or columns or view.filterset_class and view.filter_modal %}
+    {% if actions or buttons or table.column_states or view.filterset_class and view.filter_modal %}
       <div class="{{ css_toolbar }}">
         {% include "tables_pro/toolbar/main.html" %}
       </div>

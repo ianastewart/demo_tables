@@ -100,8 +100,6 @@ class TablesProView(SingleTableMixin, FilterView):
             self.object_list = qs
             table = self.get_table()
             self.preprocess_table(table)
-            exclude_columns = []
-            # if not all_columns:
             table.before_render(request)
             exclude_columns = [
                 k for k, v in table.columns.columns.items() if not v.visible
@@ -134,7 +132,6 @@ class TablesProView(SingleTableMixin, FilterView):
             filter_button=self.filter_button,
             buttons=self.get_buttons(),
             actions=self.get_actions(),
-            columns=self.column_states(self.request),
             rows=self.rows_list(),
             per_page=self.request.GET.get(
                 "per_page", self.table_pagination.get("per_page", 25)
@@ -233,14 +230,15 @@ class TablesProView(SingleTableMixin, FilterView):
         """Cell value changed"""
         return HttpResponseClientRefresh()
 
-    def column_states(self, request):
-        saved_columns = load_columns(request, self.table_class)
-        column_states = []
-        for key in self.table.sequence:
-            verbose = self.table_class.base_columns[key].verbose_name
-            if verbose:
-                column_states.append((key, verbose, key in saved_columns))
-        return column_states
+    # def column_states(self, request):
+    #     saved_columns = load_columns(request, self.table_class)
+    #     column_states = []
+    #     for key in self.table.sequence:
+    #         if key in self.table.optional_columns:
+    #             verbose = self.table_class.base_columns[key].verbose_name
+    #             if verbose:
+    #                 column_states.append((key, verbose, key in saved_columns))
+    #     return column_states
 
     def get_htmx(self, request, *args, **kwargs):
 
@@ -253,6 +251,11 @@ class TablesProView(SingleTableMixin, FilterView):
             )
             context["responsive"] = False
             response = render(request, "tables_pro/block_content.html", context)
+            get_dict = request.GET.copy()
+            del get_dict["_width"]
+            del get_dict["_height"]
+            clean_url = f"{request.htmx.current_url.split('?')[0]}?{get_dict.urlencode()}"
+            response["HX-Replace-Url"] = clean_url
             return retarget(response, "#block_content")
 
         elif request.htmx.trigger == "table_data":
@@ -323,7 +326,9 @@ class TablesProView(SingleTableMixin, FilterView):
         raise ValueError("Bad htmx get request")
 
     def preprocess_table(self, table, _filter=None):
-        """Add extra attributes needed for rendering to the table"""
+        """
+        Add extra attributes needed for rendering to the table
+        """
         table.filter = _filter
         table.infinite_scroll = self.infinite_scroll
         table.infinite_load = self.infinite_load
@@ -343,26 +348,29 @@ class TablesProView(SingleTableMixin, FilterView):
                 except NoReverseMatch:
                     pass
         table.target = self.click_target
-
-        # set columns visibility
-        columns = load_columns(self.request, table)
-        if not columns:
-            if hasattr(table.Meta, "default_columns"):
-                columns = table.Meta.default_columns
-            else:
-                columns = table.base_columns
-            save_columns(self.request, columns)
-        for k, v in table.base_columns.items():
-            if v.verbose_name:
-                table.columns.show(k) if k in columns else table.columns.hide(k)
-        # build a string containing the numbers of visible editable columns
-        visible = [col for col in table.sequence if col in columns]
-        editable = (
-            table.Meta.editable_columns
-            if hasattr(table.Meta, "editable_columns")
-            else []
-        )
-        table.editable_columns = editable
+        # Load column lists
+        if hasattr(table.Meta, "columns"):
+            fixed = table.Meta.columns.get("fixed", table.sequence)
+            table.optional_columns = [c for c in table.sequence if c not in fixed]
+            default = table.Meta.columns.get("default", table.sequence)
+            table.editable = table.Meta.columns.get("editable", [])
+        else:
+            fixed = table.sequence
+            table.optional_columns = table.sequence[1:] if len(table.sequence) > 0 else []
+            default = table.sequence
+            table.editable = []
+        # set column states for use in column dropdown and current visibility
+        visible = load_columns(self.request, table)
+        if not visible:
+            visible = default
+            save_columns(self.request, visible)
+        column_states = []
+        for key in table.sequence:
+            if key in self.table.optional_columns:
+                header = self.table.columns.columns[key].header
+                column_states.append((key, header, key in visible))
+                table.columns.show(key) if key in visible else table.columns.hide(key)
+        table.column_states = column_states
 
         if table.filter:
             table.filter.style = self.filter_style
