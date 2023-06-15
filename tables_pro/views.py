@@ -15,6 +15,9 @@ from django_tables2 import SingleTableMixin
 from django_tables2.export.export import TableExport
 
 from tables_pro.utils import (
+    build_media_query,
+    define_columns,
+    set_column_states,
     save_columns,
     load_columns,
     set_column,
@@ -63,6 +66,7 @@ class TablesProView(SingleTableMixin, FilterView):
     dataset_kwargs = None
 
     export_formats = (TableExport.CSV,)
+    width = 0
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -96,7 +100,7 @@ class TablesProView(SingleTableMixin, FilterView):
                     ):
                         qs = filterset.qs
             filename = "Export"
-            """Use tablib to export in desired format"""
+            # Use tablib to export in desired format
             self.object_list = qs
             table = self.get_table()
             self.preprocess_table(table)
@@ -113,6 +117,89 @@ class TablesProView(SingleTableMixin, FilterView):
             )
             return exporter.response(filename=f"{filename}.{export_format}")
         return super().get(request, *args, **kwargs)
+
+    def get_htmx(self, request, *args, **kwargs):
+        if request.htmx.trigger == "media_query":
+            # Client has sent its width as a result of a media-query
+            # Respond with appropriately sized table to replace block_content
+            self.filterset = self.get_filterset(self.get_filterset_class())
+            self.object_list = self.filterset.qs
+            self.width = int(request.GET.get("_width", 0))
+            context = self.get_context_data(
+                filter=self.filterset, object_list=self.object_list
+            )
+            context["table"].responsive = False
+            response = render(request, "tables_pro/block_content.html", context)
+            response["HX-Retarget"] = "#block_content"
+            response["HX-Reswap"] = "outerHTML"
+            return response
+
+        elif request.htmx.trigger == "table_data":
+            # triggered refresh of table data after create or update
+            return self.render_template(self.table_data_template_name, *args, **kwargs)
+
+        elif request.htmx.trigger_name == "filter" and self.filterset_class:
+            # show filter modal
+            context = {"filter": self.filterset_class(request.GET)}
+            return render(request, self.filter_template_name, context)
+
+        elif request.htmx.trigger_name == "filter_form":
+            # a filter value was changed
+            return self.render_template(self.table_data_template_name, *args, **kwargs)
+
+        elif "id_row" in request.htmx.trigger:
+            # change number of rows to display
+            rows = request.htmx.trigger_name
+            save_per_page(request, rows)
+            url = self._update_parameter(request, "per_page", rows)
+            return HttpResponseClientRedirect(url)
+
+        elif "tr_" in request.htmx.trigger:
+            # infinite scroll/load_more or click on row
+            if "_scroll" in request.GET:
+                return self.render_template(self.rows_template_name, *args, **kwargs)
+
+            return self.row_clicked(
+                request.htmx.trigger.split("_")[1],
+                request.htmx.target,
+                request.htmx.current_url,
+            )
+
+        elif "td_" in request.htmx.trigger:
+            # cell clicked
+            bits = request.htmx.trigger.split("_")
+            return self.cell_clicked(
+                record_pk=bits[1],
+                column_name=visible_columns(request, self.table_class)[int(bits[2])],
+                target=request.htmx.target,
+            )
+
+        # Column handling
+        elif "id_col_reset" in request.htmx.trigger:
+            # Reset default columns settings.
+            # To make sure the column drop down is correctly updated we do a client refresh,
+            table = self.table_class([])
+            define_columns(table, self.width)
+            save_columns(request, self.width, table.columns_default)
+            return HttpResponseClientRefresh()
+
+        elif "id_col" in request.htmx.trigger:
+            # Click on a column checkbox in the dropdown re-renders the table data with new column settings.
+            # The column dropdown does not need to be rendered because the checkboxes are in the correct state,
+            col_name = request.htmx.trigger_name[5:]
+            checked = request.htmx.trigger_name in request.GET
+            set_column(request, self.width, col_name, checked)
+            return self.render_template(self.table_data_template_name, *args, **kwargs)
+
+        elif "id_" in request.htmx.trigger:
+            # filter value changed
+            url = self._update_parameter(
+                request,
+                request.htmx.trigger_name,
+                request.GET.get(request.htmx.trigger_name, ""),
+            )
+            return HttpResponseClientRedirect(url)
+        raise ValueError("Bad htmx get request")
 
     def rows_list(self):
         return [10, 15, 20, 25, 50, 100]
@@ -136,8 +223,8 @@ class TablesProView(SingleTableMixin, FilterView):
             per_page=self.request.GET.get(
                 "per_page", self.table_pagination.get("per_page", 25)
             ),
-            default=True,
-            responsive=hasattr(self, "responsive"),
+            media_query=build_media_query(self.table),
+            responsive=self.table.responsive,
         )
         return context
 
@@ -153,14 +240,6 @@ class TablesProView(SingleTableMixin, FilterView):
                         ],
                         target=request.htmx.target,
                     )
-
-        if "columns_save" in request.POST:
-            column_list = []
-            for key in request.POST.items():
-                if key[1] == "on":
-                    column_list.append(key[0])
-            save_columns(request, column_list)
-            return self.render_template(self.table_data_template_name, *args, **kwargs)
 
         # It's an action performed on a queryset`
         if "select_all" in request.POST:
@@ -230,101 +309,6 @@ class TablesProView(SingleTableMixin, FilterView):
         """Cell value changed"""
         return HttpResponseClientRefresh()
 
-    # def column_states(self, request):
-    #     saved_columns = load_columns(request, self.table_class)
-    #     column_states = []
-    #     for key in self.table.sequence:
-    #         if key in self.table.optional_columns:
-    #             verbose = self.table_class.base_columns[key].verbose_name
-    #             if verbose:
-    #                 column_states.append((key, verbose, key in saved_columns))
-    #     return column_states
-
-    def get_htmx(self, request, *args, **kwargs):
-
-        if request.htmx.trigger == "size_query":
-            # respond with appropriately sized table
-            self.filterset = self.get_filterset(self.get_filterset_class())
-            self.object_list = self.filterset.qs
-            context = self.get_context_data(
-                filter=self.filterset, object_list=self.object_list
-            )
-            context["responsive"] = False
-            response = render(request, "tables_pro/block_content.html", context)
-            get_dict = request.GET.copy()
-            del get_dict["_width"]
-            del get_dict["_height"]
-            clean_url = f"{request.htmx.current_url.split('?')[0]}?{get_dict.urlencode()}"
-            response["HX-Replace-Url"] = clean_url
-            return retarget(response, "#block_content")
-
-        elif request.htmx.trigger == "table_data":
-            # triggered refresh of table data after create or update
-            return self.render_template(self.table_data_template_name, *args, **kwargs)
-
-        elif request.htmx.trigger_name == "filter" and self.filterset_class:
-            # show filter modal
-            context = {"filter": self.filterset_class(request.GET)}
-            return render(request, self.filter_template_name, context)
-
-        elif request.htmx.trigger_name == "filter_form":
-            # a filter value was changed
-            return self.render_template(self.table_data_template_name, *args, **kwargs)
-
-        elif "id_col" in request.htmx.trigger:
-            # click on column checkbox in dropdown re-renders the table with new column settings
-            col_name = request.htmx.trigger_name[4:]
-            checked = request.htmx.trigger_name in request.GET
-            set_column(request, self.table_class, col_name, checked)
-            return self.render_template(self.table_data_template_name, *args, **kwargs)
-
-        elif "id_row" in request.htmx.trigger:
-            # change number of rows to display
-            rows = request.htmx.trigger_name
-            save_per_page(request, rows)
-            url = self._update_parameter(request, "per_page", rows)
-            return HttpResponseClientRedirect(url)
-
-        elif "default" in request.htmx.trigger:
-            # restore default number of rows if defined in Meta else all columns"""
-            try:
-                column_list = list(self.table_class.Meta.default_columns)
-            except AttributeError:
-                column_list = list(self.table_class.base_columns.keys())
-            save_columns(request, column_list)
-            return HttpResponseClientRefresh()
-
-        elif "tr_" in request.htmx.trigger:
-            # infinite scroll/load_more or click on row
-            if "_scroll" in request.GET:
-                return self.render_template(self.rows_template_name, *args, **kwargs)
-
-            return self.row_clicked(
-                request.htmx.trigger.split("_")[1],
-                request.htmx.target,
-                request.htmx.current_url,
-            )
-
-        elif "td_" in request.htmx.trigger:
-            # cell clicked
-            bits = request.htmx.trigger.split("_")
-            return self.cell_clicked(
-                record_pk=bits[1],
-                column_name=visible_columns(request, self.table_class)[int(bits[2])],
-                target=request.htmx.target,
-            )
-
-        elif "id_" in request.htmx.trigger:
-            # filter value changed
-            url = self._update_parameter(
-                request,
-                request.htmx.trigger_name,
-                request.GET.get(request.htmx.trigger_name, ""),
-            )
-            return HttpResponseClientRedirect(url)
-
-        raise ValueError("Bad htmx get request")
-
     def preprocess_table(self, table, _filter=None):
         """
         Add extra attributes needed for rendering to the table
@@ -333,6 +317,7 @@ class TablesProView(SingleTableMixin, FilterView):
         table.infinite_scroll = self.infinite_scroll
         table.infinite_load = self.infinite_load
         table.sticky_header = self.sticky_header
+        # variable that control action when table is clicked
         table.method = self.click_method
         table.url = ""
         table.pk = False
@@ -348,39 +333,29 @@ class TablesProView(SingleTableMixin, FilterView):
                 except NoReverseMatch:
                     pass
         table.target = self.click_target
-        # Load column lists
-        if hasattr(table.Meta, "columns"):
-            fixed = table.Meta.columns.get("fixed", table.sequence)
-            table.optional_columns = [c for c in table.sequence if c not in fixed]
-            default = table.Meta.columns.get("default", table.sequence)
-            table.editable = table.Meta.columns.get("editable", [])
-        else:
-            fixed = table.sequence
-            table.optional_columns = table.sequence[1:] if len(table.sequence) > 0 else []
-            default = table.sequence
-            table.editable = []
-        # set column states for use in column dropdown and current visibility
-        visible = load_columns(self.request, table)
-        if not visible:
-            visible = default
-            save_columns(self.request, visible)
-        column_states = []
-        for key in table.sequence:
-            if key in self.table.optional_columns:
-                header = self.table.columns.columns[key].header
-                column_states.append((key, header, key in visible))
-                table.columns.show(key) if key in visible else table.columns.hide(key)
-        table.column_states = column_states
+
+        # define possible columns depending upon the current width
+        define_columns(table, width=self.width)
+
+        # set visible columns according to saved setting
+        table.columns_visible = load_columns(self.request, width=self.width)
+        if not table.columns_visible:
+            table.columns_visible = table.columns_default
+            save_columns(
+                self.request, width=self.width, column_list=table.columns_visible
+            )
+
+        set_column_states(table)
 
         if table.filter:
             table.filter.style = self.filter_style
+            # If filter is in header, build list of filters in same sequence as columns
             if self.filter_style == self.FilterStyle.HEADER:
-                # build list of filters in same sequence as columns
                 table.header_fields = []
-                for key in table.sequence:
-                    if table.columns.columns[key].visible:
-                        if key in table.filter.base_filters.keys():
-                            table.header_fields.append(table.filter.form[key])
+                for col in table.sequence:
+                    if table.columns.columns[col].visible:
+                        if col in table.filter.base_filters.keys():
+                            table.header_fields.append(table.filter.form[col])
                         else:
                             table.header_fields.append(None)
         # if self.sticky_header:

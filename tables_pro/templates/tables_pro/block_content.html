@@ -1,39 +1,38 @@
-{% load static %}
+{% load static tables_pro %}
 <div id="block_content">
-{% if not responsive %}
-  {% if view.filterset_class and view.filter_style == 1 %}
-    <div class="{{ css_toolbar }}">
-      {% include "tables_pro/filter_toolbar.html" %}
-    </div>
-  {% endif %}
-  <form hx-post="" hx-target="#modals-here">
-    {% csrf_token %}
-    {% if actions or buttons or table.column_states or view.filterset_class and view.filter_modal %}
-      <div class="{{ css_toolbar }}">
-        {% include "tables_pro/toolbar/main.html" %}
-      </div>
-    {% endif %}
-    <div id="table_data" class="{{ css_table }}">
-      {% include "tables_pro/render_table_data.html" %}
-    </div>
-  </form>
+
+
+{% if not table.responsive %}
+  <div id="block_table">
+  {% include "tables_pro/block_table.html" %}
+  </div>
   <div id="modals-here"></div>
 {% endif %}
-<script src="{% static "htmx1.9.1.min.js" %}"></script>
-<script src="{% static "tables_pro/js/table_functions.js" %}"></script>
-<script>tableFunctions.init();</script>
-{% if responsive %}
-  <div id="size_query"></div>
-  <script>
-    var w = window.innerWidth
-    var h = window.innerHeight
-    htmx.ajax('GET', "", {"source": "#size_query", "values": {_width: w, _height: h}});
-  </script>
+<div id="media_query" table="{{ table }}"></div>
+
+{% if table.responsive %}
+<script>
+  window.addEventListener('load', function (){
+    console.log("responsive")
+    {% media_query table %}
+  })
+</script>
 {% else %}
   <script>
-  tableFunctions.init()
+  window.addEventListener('load', function (){
+    console.log("not responsive")
+    tablesPro.init()
+  })
   </script>
+
 {% endif %}
-</div>
+{#<script>#}
+{#  window.addEventListener('load', function (){#}
+{#    console.log("load")#}
+{#    {% media_query table %}#}
+{#    tablesPro.init()#}
+{#  })#}
+{#</script>#}
+
 
 

@@ -1,6 +1,6 @@
 // Handle checkboxes in tables, and modal forms
 'use strict';
-var tableFunctions = (function () {
+var tablesPro = (function () {
     let tb = {};
     console.log("Begin")
     let lastChecked = null

@@ -1,4 +1,5 @@
-from tables_pro.tables import *
+import django_tables2 as tables
+from tables_pro.columns import CurrencyColumn, RightAlignedColumn, SelectionColumn
 from movies.models import Movie
 
 
@@ -38,17 +39,19 @@ class MovieTable3(tables.Table):
         )
         attrs = {"class": "table table-sm table-hover hover-link"}
         sequence = ("selection",)
-        columns = {
+
+        columns_lg = {
             "fixed": ["selection", "title", "budget", "popularity"],
-            "default": ["release_date"],
         }
         columns_md = {
             "fixed": ["selection", "title", "budget"],
+            "default": ["selection", "title", "budget"],
         }
         columns_sm = {
             "fixed": ["selection", "title"],
+            "default": ["selection", "title"],
         }
-        responsive = {500: columns_sm, 768: columns_sm}
+        responsive = {300: columns_sm, 768: columns_md, 1000: columns_lg}
 
     selection = SelectionColumn()
     budget = CurrencyColumn(prefix="$")

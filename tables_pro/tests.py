@@ -1,6 +1,146 @@
 import pytest
+from django_tables2 import tables
+from tables_pro.columns import SelectionColumn
 from tables_pro.buttons import Button
-# from tables_pro.utils import update_url
+from django.db.models import *
+from tables_pro.utils import define_columns, build_media_query
+
+
+class TestModel(Model):
+    a = CharField(max_length=20)
+    b = CharField(max_length=20)
+    c = CharField(max_length=20)
+    d = CharField(max_length=20)
+
+
+class TestTable1(tables.Table):
+    class Meta:
+        model = TestModel
+
+
+def test_define_columns_no_fields_means_all_fixed():
+    table = TestTable1([])
+    define_columns(table, width=0)
+    assert table.columns_fixed == ["id"]
+    assert table.columns_optional == ["a", "b", "c", "d"]
+    assert table.columns_default == ["id", "a", "b", "c", "d"]
+
+
+class TestTable2(tables.Table):
+    class Meta:
+        model = TestModel
+        fields = ["a", "b", "c"]
+
+
+def test_define_columns_fields():
+    table = TestTable2([])
+    define_columns(table, width=0)
+    assert table.columns_fixed == ["a"]
+    assert table.columns_optional == ["b", "c"]
+    assert table.columns_default == ["a", "b", "c"]
+
+
+class TestTable3(tables.Table):
+    class Meta:
+        model = TestModel
+        fields = ["a", "b", "c"]
+        sequence = ["c", "b", "a"]
+
+
+def test_define_columns_sequence():
+    table = TestTable3([])
+    define_columns(table, width=0)
+    assert table.columns_fixed == ["c"]
+    assert table.columns_optional == ["b", "a"]
+    assert table.columns_default == ["c", "b", "a"]
+
+
+class TestTable4(tables.Table):
+    class Meta:
+        model = TestModel
+        fields = ["a", "b", "c"]
+        columns = {"fixed": ["a", "b"], "default": ["a", "b", "c"]}
+
+
+def test_define_columns_fixed_and_default():
+    table = TestTable4([])
+    define_columns(table, width=0)
+    assert table.columns_fixed == ["a", "b"]
+    assert table.columns_optional == ["c"]
+    assert table.columns_default == ["a", "b", "c"]
+
+
+class TestTable5(tables.Table):
+    class Meta:
+        model = TestModel
+        fields = ["a", "b", "c", "d"]
+        columns = {"fixed": ["a", "b", "c", "d"]}
+        responsive = {
+            100: {"fixed": ["a"]},
+            500: {"fixed": ["a", "b"], "default": ["a", "b", "c"]},
+            1000: {"fixed": ["a", "b", "c"], "default": ["a", "b", "c", "d"]},
+        }
+
+
+def test_define_columns_responsive():
+    table = TestTable5([])
+    define_columns(table, width=100)
+    assert table.columns_fixed == ["a"]
+    assert table.columns_optional == ["b", "c", "d"]
+    assert table.columns_default == ["a", "b", "c", "d"]
+    define_columns(table, width=500)
+    assert table.columns_fixed == ["a", "b"]
+    assert table.columns_optional == ["c", "d"]
+    assert table.columns_default == ["a", "b", "c"]
+    define_columns(table, width=1000)
+    assert table.columns_fixed == ["a", "b", "c"]
+    assert table.columns_optional == ["d"]
+    assert table.columns_default == ["a", "b", "c", "d"]
+    assert table.columns_default == ["a", "b", "c", "d"]
+
+def test_media_query():
+    table = TestTable5([])
+    define_columns(table, width=100)
+    script = build_media_query(table)
+    assert "if(window.matchMedia('(min-width: {100}px)')){w=100}" in script
+    print(script)
+class TestTable6(tables.Table):
+    class Meta:
+        model = TestModel
+        fields = ["a", "b", "c", "d"]
+        responsive = {
+            100: {"fixed": ["a"]},
+            1000: {},
+        }
+
+
+def test_define_columns_responsive_no_defaults():
+    table = TestTable6([])
+    define_columns(table, width=100)
+    assert table.columns_fixed == ["a"]
+    ## default=all fields if default not specified
+    assert table.columns_default == ["a", "b", "c", "d"]
+    define_columns(table, width=1000)
+    # Only first field is fixed if fixed not specified
+    assert table.columns_fixed == ["a"]
+    # default is every field if no fixed and no default
+    assert table.columns_default == ["a", "b", "c", "d"]
+
+
+
+class TestTable7(tables.Table):
+    class Meta:
+        model = TestModel
+        fields = ["a", "b", "c", "d"]
+        sequence = ["selection", "..."]
+
+    selection = SelectionColumn()
+
+
+def test_define_columns_with_selection():
+    table = TestTable7([])
+    define_columns(table, width=0)
+    assert table.columns_fixed == ["selection", "a"]
 
 
 def test_default_button():
@@ -15,7 +155,12 @@ def test_default_button():
 
 def test_button_renders_attributes():
     button = Button(
-        "Test button", css="btn btn-secondary", type="submit", name="test_name", hx_get="/test", hx_target="#target"
+        "Test button",
+        css="btn btn-secondary",
+        type="submit",
+        name="test_name",
+        hx_get="/test",
+        hx_target="#target",
     )
     html = button.render()
     assert 'class="btn btn-secondary"' in html

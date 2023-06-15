@@ -1,73 +1,111 @@
 from urllib.parse import urlparse, parse_qs, quote
+from django.http import HttpRequest
 
 
 def _base_key(request):
     return request.resolver_match.view_name
 
 
-def save_columns(request, column_list):
-    key = f"columns:{_base_key(request)}"
-    request.session[key] = list(column_list)
+def save_columns(request: HttpRequest, width: int, column_list: list):
+    key = f"columns:{request.resolver_match.view_name}:{width}"
+    request.session[key] = column_list
 
 
-def load_columns(request, table_class):
-    key = f"columns:{_base_key(request)}"
-    if key in request.session:
-        return request.session[key]
-    return None
-    # if hasattr(table_class, "Meta") and hasattr(table_class.Meta, "default_columns"):
-    #     columns = table_class.Meta.default_columns
-    # else:
-    #     columns = table_class.sequence
-    # save_columns(request, columns)
-    # return columns
+def load_columns(request: HttpRequest, width: int):
+    key = f"columns:{request.resolver_match.view_name}:{width}"
+    return request.session[key] if key in request.session else None
 
 
-def set_column(request, table_class, column_name, checked):
-    columns = load_columns(request, table_class)
+def set_column(
+    request: HttpRequest, width: int, column_name: str, checked: bool
+) -> list:
+    columns = load_columns(request, width)
     if checked:
         if column_name not in columns:
             columns.append(column_name)
     elif column_name in columns:
         columns.remove(column_name)
-    save_columns(request, columns)
+    save_columns(request, width, columns)
+    return columns
 
 
-def visible_columns(request, table_class):
-    """return list of visible columns in correct sequence"""
+def visible_columns(request: HttpRequest, width, table_class):
+    """
+    return list of visible columns in correct sequence
+    """
     sequence = table_class(data=[]).sequence
-    columns = load_columns(request, table_class)
+    columns = load_columns(request, width)
     return [col for col in sequence if col in columns]
 
 
-def save_per_page(request, value):
-    key = f"per_page:{_base_key(request)}"
+def define_columns(table, width):
+    """
+    Add 4 lists of column names to table:
+    columns_fixed = columns that are always visible
+    columns_optional = columns that the user can choose to show
+    columns_default = default visible columns
+    columns_editable = columns that can be edited in situ
+    """
+    table.responsive = False
+    table.columns_fixed = []
+    table.columns_default = table.sequence
+    table.columns_editable = []
+    if table.Meta:
+        col_dict = {}
+        if hasattr(table.Meta, "editable"):
+            table.columns_editable = table.Meta.editable
+        if hasattr(table.Meta, "columns"):
+            col_dict = table.Meta.columns
+        if hasattr(table.Meta, "responsive"):
+            table.responsive = True
+            col_dict = table.Meta.responsive.get(width, {})
+        table.columns_fixed = col_dict.get("fixed", [])
+        table.columns_default = col_dict.get("default", table.sequence)
+    if not table.columns_fixed:
+        table.columns_fixed = table.sequence[:1]
+        if "selection" in table.columns_fixed and len(table.sequence) > 1:
+            table.columns_fixed = table.sequence[:2]
+    table.columns_optional = [c for c in table.sequence if c not in table.columns_fixed]
+
+
+def set_column_states(table):
+    """
+    Control column visibility and
+    add attribute 'columns_states' - a list of tuples used to create the column dropdown
+    Expects 'table.columns_visible' to have been updated beforehand
+    """
+    for col in table.sequence:
+        if col in table.columns_visible:
+            table.columns.show(col)
+        else:
+            table.columns.hide(col)
+    table.column_states = [
+        (col, table.columns.columns[col].header, col in table.columns_visible)
+        for col in table.columns_optional
+    ]
+
+
+def build_media_query(table):
+    query = ""
+    if hasattr(table.Meta, "responsive"):
+        query = "let w=0\n"
+        for width in table.Meta.responsive.keys():
+            query += (
+                "if(window.matchMedia('(min-width: "
+                + str(width)
+                + "px)').matches){w="
+                + str(width)
+                + "}\n"
+            )
+        query += "htmx.ajax('GET','',{'source': '#media_query','values':{_width: w}})\n"
+    return query
+
+
+def save_per_page(request: HttpRequest, value: str):
+    key = f"per_page:{request.resolver_match.view_name}"
     request.session[key] = value
 
 
-def load_per_page(request):
-    key = f"per_page:{_base_key(request)}"
-    if key in request.session:
-        return request.session[key]
-    return 0
-
-
-# def update_url(url, key, value):
-#     """Add or replace 'key=value' in url"""
-#     # todo handle multi value filter
-#     query = urlparse(url).query
-#     existing = ""
-#     # if isinstance(value, str):
-#     #     value = quote(value)
-#     new_param = f"{key}={value}"
-#     s = query.find(f"{key}=")
-#     if s > -1:
-#         e = query.index("&", s) if "&" in query[s:] else len(query)
-#         existing = query[s:e]
-#     if existing:
-#         url = url.replace(existing, new_param)
-#     elif "?" in url:
-#         url = f"{url}&{new_param}"
-#     else:
-#         url = f"{url}?{new_param}"
-#     return url
+def load_per_page(request: HttpRequest):
+    key = f"per_page:{request.resolver_match.view_name}"
+    return request.session[key] if key in request.session else 0

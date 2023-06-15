@@ -24,7 +24,6 @@ class MoviesTable1View(TablesProView):
     table_class = MovieTable1
     template_name = "movies/table.html"
     model = Movie
-    responsive = True
 
 
 class MoviesTable2View(TablesProView):

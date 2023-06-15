@@ -1,5 +1,5 @@
 {% extends "movies/base.html" %}
-{% load bootstrap4 %}
+{% load bootstrap4 static %}
 {% block head %}
   {% include "tables_pro/block_head.html" %}
 {% endblock %}
@@ -11,4 +11,6 @@
     </div>
     {% include "tables_pro/block_content.html" %}
   </div>
+  <script src="{% static "htmx1.9.1.min.js" %}"></script>
+  <script src="{% static "tables_pro/js/tables_pro.js" %}"></script>
 {% endblock %}
