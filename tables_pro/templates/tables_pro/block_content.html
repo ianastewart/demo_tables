@@ -8,31 +8,6 @@
   </div>
   <div id="modals-here"></div>
 {% endif %}
-<div id="media_query" table="{{ table }}"></div>
-
-{% if table.responsive %}
-<script>
-  window.addEventListener('load', function (){
-    console.log("responsive")
-    {% media_query table %}
-  })
-</script>
-{% else %}
-  <script>
-  window.addEventListener('load', function (){
-    console.log("not responsive")
-    tablesPro.init()
-  })
-  </script>
-
-{% endif %}
-{#<script>#}
-{#  window.addEventListener('load', function (){#}
-{#    console.log("load")#}
-{#    {% media_query table %}#}
-{#    tablesPro.init()#}
-{#  })#}
-{#</script>#}
-
-
-
+{{ breakpoints|json_script:"breakpoints" }}
+  <script src="{% static "tables_pro/js/media_query.js" %}"></script>
+</div>

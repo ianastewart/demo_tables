@@ -15,7 +15,7 @@ from django_tables2 import SingleTableMixin
 from django_tables2.export.export import TableExport
 
 from tables_pro.utils import (
-    build_media_query,
+    breakpoints,
     define_columns,
     set_column_states,
     save_columns,
@@ -223,8 +223,7 @@ class TablesProView(SingleTableMixin, FilterView):
             per_page=self.request.GET.get(
                 "per_page", self.table_pagination.get("per_page", 25)
             ),
-            media_query=build_media_query(self.table),
-            responsive=self.table.responsive,
+            breakpoints=breakpoints(self.table),
         )
         return context
 

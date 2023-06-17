@@ -3,7 +3,7 @@ from django_tables2 import tables
 from tables_pro.columns import SelectionColumn
 from tables_pro.buttons import Button
 from django.db.models import *
-from tables_pro.utils import define_columns, build_media_query
+from tables_pro.utils import define_columns, get_breakpoints
 
 
 class TestModel(Model):
@@ -98,12 +98,15 @@ def test_define_columns_responsive():
     assert table.columns_default == ["a", "b", "c", "d"]
     assert table.columns_default == ["a", "b", "c", "d"]
 
+
 def test_media_query():
     table = TestTable5([])
     define_columns(table, width=100)
-    script = build_media_query(table)
+    script = get_breakpoints(table)
     assert "if(window.matchMedia('(min-width: {100}px)')){w=100}" in script
     print(script)
+
+
 class TestTable6(tables.Table):
     class Meta:
         model = TestModel
@@ -125,7 +128,6 @@ def test_define_columns_responsive_no_defaults():
     assert table.columns_fixed == ["a"]
     # default is every field if no fixed and no default
     assert table.columns_default == ["a", "b", "c", "d"]
-
 
 
 class TestTable7(tables.Table):

@@ -85,20 +85,11 @@ def set_column_states(table):
     ]
 
 
-def build_media_query(table):
-    query = ""
-    if hasattr(table.Meta, "responsive"):
-        query = "let w=0\n"
-        for width in table.Meta.responsive.keys():
-            query += (
-                "if(window.matchMedia('(min-width: "
-                + str(width)
-                + "px)').matches){w="
-                + str(width)
-                + "}\n"
-            )
-        query += "htmx.ajax('GET','',{'source': '#media_query','values':{_width: w}})\n"
-    return query
+def breakpoints(table):
+    bps = (
+        list(table.Meta.responsive.keys()) if hasattr(table.Meta, "responsive") else []
+    )
+    return {"breakpoints": bps}
 
 
 def save_per_page(request: HttpRequest, value: str):
