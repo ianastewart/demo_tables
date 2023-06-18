@@ -1,14 +1,12 @@
 {% load static tables_pro %}
 <div id="block_content">
-
-
-    {% if table.responsive %}
+    {% if breakpoints %}
+        {{ breakpoints|json_script:"breakpoints" }}
+        <script src="{% static "tables_pro/js/media_query.js" %}"></script>
+    {% else %}
         <div id="block_table">
             {% include "tables_pro/block_table.html" %}
         </div>
         <div id="modals-here"></div>
-    {% else %}
-        {{ breakpoints|json_script:"breakpoints" }}
-        <script src="{% static "tables_pro/js/media_query.js" %}"></script>
     {% endif %}
 </div>

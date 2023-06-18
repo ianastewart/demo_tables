@@ -128,7 +128,7 @@ class TablesProView(SingleTableMixin, FilterView):
             context = self.get_context_data(
                 filter=self.filterset, object_list=self.object_list
             )
-            context["table"].responsive = False
+            context["breakpoints"] = None
             response = render(request, "tables_pro/block_content.html", context)
             response["HX-Retarget"] = "#block_content"
             response["HX-Reswap"] = "outerHTML"
