@@ -2,12 +2,13 @@
 <div id="block_content">
 
 
-{% if not table.responsive %}
-  <div id="block_table">
-  {% include "tables_pro/block_table.html" %}
-  </div>
-  <div id="modals-here"></div>
-{% endif %}
-{{ breakpoints|json_script:"breakpoints" }}
-  <script src="{% static "tables_pro/js/media_query.js" %}"></script>
+    {% if table.responsive %}
+        <div id="block_table">
+            {% include "tables_pro/block_table.html" %}
+        </div>
+        <div id="modals-here"></div>
+    {% else %}
+        {{ breakpoints|json_script:"breakpoints" }}
+        <script src="{% static "tables_pro/js/media_query.js" %}"></script>
+    {% endif %}
 </div>
