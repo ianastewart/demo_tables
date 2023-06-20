@@ -5,7 +5,7 @@ from django_htmx.http import HttpResponseClientRedirect, retarget
 from django.http import HttpResponse
 from .models import Movie
 from tables_pro.views import TablesProView, SelectedMixin
-from .tables import MovieTable1, MovieTable3
+from .tables import MovieTable1, MovieTable2, MovieTable3
 from .filters import MovieFilter
 
 
@@ -44,7 +44,7 @@ class MoviesTable2View(TablesProView):
 
 class MoviesTable3View(TablesProView):
     title = "Selection and actions"
-    table_class = MovieTable3
+    table_class = MovieTable2
     template_name = "movies/table.html"
     model = Movie
 

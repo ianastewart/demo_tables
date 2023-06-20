@@ -58,7 +58,11 @@ def define_columns(table, width):
             col_dict = table.Meta.columns
         if hasattr(table.Meta, "responsive"):
             table.responsive = True
-            col_dict = table.Meta.responsive.get(width, {})
+            key = 0
+            for breakpoint in table.Meta.responsive.keys():
+                if width >= breakpoint:
+                    key = breakpoint
+            col_dict = table.Meta.responsive.get(key, {})
         table.columns_fixed = col_dict.get("fixed", [])
         table.columns_default = col_dict.get("default", table.sequence)
     if not table.columns_fixed:

@@ -14,13 +14,34 @@ class MovieTable1(tables.Table):
             "revenue",
             "runtime",
         )
-
         attrs = {
             "class": "table table-sm table-hover hover-link",
             "thead": {"class": "bg-light border-top border-bottom"},
         }
-        # row_attrs = {"th": {"class": "bg-dark"}}
 
+    budget = CurrencyColumn(prefix="$")
+    revenue = CurrencyColumn(prefix="$")
+    runtime = RightAlignedColumn()
+
+
+class MovieTable2(tables.Table):
+    class Meta:
+        model = Movie
+        fields = (
+            "title",
+            "budget",
+            "popularity",
+            "release_date",
+            "revenue",
+            "runtime",
+        )
+        sequence = ("selection",)
+        attrs = {
+            "class": "table table-sm table-hover hover-link",
+            "thead": {"class": "bg-light border-top border-bottom"},
+        }
+
+    selection = SelectionColumn()
     budget = CurrencyColumn(prefix="$")
     revenue = CurrencyColumn(prefix="$")
     runtime = RightAlignedColumn()
@@ -37,8 +58,8 @@ class MovieTable3(tables.Table):
             "revenue",
             "runtime",
         )
-        attrs = {"class": "table table-sm table-hover hover-link"}
         sequence = ("selection",)
+        attrs = {"class": "table table-sm table-hover hover-link"}
 
         columns_lg = {
             "fixed": ["selection", "title", "budget", "popularity"],
@@ -50,8 +71,9 @@ class MovieTable3(tables.Table):
         columns_sm = {
             "fixed": ["selection", "title"],
             "default": ["selection", "title"],
+            "template": "movies/mobile.html"
         }
-        responsive = {300: columns_sm, 768: columns_md, 1000: columns_lg}
+        responsive = {300: columns_sm, 600: columns_md, 1000: columns_lg}
 
     selection = SelectionColumn()
     budget = CurrencyColumn(prefix="$")

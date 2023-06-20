@@ -7,21 +7,34 @@ var tablesPro = (function () {
     let selAll = null
     let selAllPage = null
     tb.init = function () {
-      window.addEventListener("load", onLoad)
+      console.log("init")
+      let url = new URL(window.location.href)
+      const w = url.searchParams.get("_width")
+      if(w !== null) {
+        if (parseInt(w) !== window.outerWidth){
+           window.location.href = window.location.href.replace(`_width=${w}`, `_width=${window.outerWidth}`)        }
+      }
+
+
+      //window.addEventListener("load", onLoad)
       selAll = document.getElementById('select_all')
       selAllPage = document.getElementById('select_all_page')
-      if (selAll) {
-        selAll.addEventListener("click", selectAll)
-      }
       if (selAllPage) {
         selAllPage.addEventListener("click", selectAllPage)
+        selectAllPage()
       }
+      if (selAll) {
+        selAll.addEventListener("click", selectAll)
+        selectAll()
+      }
+
       // document.getElementById('select_all_page').addEventListener("click", selectAllPage )
       Array.from(document.getElementsByTagName("table")).forEach(e => e.addEventListener("click", tableClick));
       Array.from(document.querySelectorAll(".auto-submit")).forEach(e => e.addEventListener("change", function () {
         document.getElementById("id_table_form").submit()
       }));
-      Array.from(document.querySelectorAll(".form-group.hx-get")).forEach(e => e.addEventListener("change", filterChanged));
+      Array.from(document.querySelectorAll(".form-group.hx-get")).forEach(e => e.addEventListener("change", filterChanged))
+
       countChecked()
       document.body.addEventListener("trigger", function (evt) {
         htmx.ajax('GET', evt.detail.url, {source: '#table_data', 'target': '#table_data'});
@@ -31,24 +44,48 @@ var tablesPro = (function () {
       // }
     }
 
-    function onLoad() {
-      countChecked();
-      if (selAll) {
-        if (selAll.checked) {
-          Array.from(document.getElementsByClassName("select-checkbox")).forEach(function (box) {
-            box.checked = true;
-            box.disabled = false;
-            highlightRow(box);
-          })
-          selAll.parentElement.style.display = 'block';
-          document.getElementById('count').innerText = 'All';
-          document.getElementById('select_all_page').disabled = true;
-          Array.from(document.getElementsByClassName("select-checkbox")).forEach(function (box) {
-            box.disabled = true;
-          })
+    function removeURLParameter(url, parameter) {
+      //prefer to use l.search if you have a location/link object
+      var urlparts = url.split('?');
+      if (urlparts.length >= 2) {
+
+        var prefix = encodeURIComponent(parameter) + '=';
+        var pars = urlparts[1].split(/[&;]/g);
+
+        //reverse iteration as may be destructive
+        for (var i = pars.length; i-- > 0;) {
+          //idiom for string.startsWith
+          if (pars[i].lastIndexOf(prefix, 0) !== -1) {
+            pars.splice(i, 1);
+          }
         }
+
+        return urlparts[0] + (pars.length > 0 ? '?' + pars.join('&') : '');
       }
+      return url;
     }
+
+    // tb.onload = function() {
+    // function onLoad() {
+    //   init()
+    //   console.log("onLoad")
+    //   countChecked()
+    //   if (selAll) {
+    //     if (selAll.checked) {
+    //       Array.from(document.getElementsByClassName("select-checkbox")).forEach(function (box) {
+    //         box.checked = true;
+    //         box.disabled = false;
+    //         highlightRow(box);
+    //       })
+    //       selAll.parentElement.style.display = 'block';
+    //       document.getElementById('count').innerText = 'All';
+    //       document.getElementById('select_all_page').disabled = true;
+    //       Array.from(document.getElementsByClassName("select-checkbox")).forEach(function (box) {
+    //         box.disabled = true;
+    //       })
+    //     }
+    //   }
+    // }
 
 
     function filterChanged() {
@@ -61,7 +98,7 @@ var tablesPro = (function () {
 
     function selectAllPage() {
       // Click on 'Select all on page' highlights all rows
-      let checked = this.checked;
+      let checked = selAllPage.checked
       if (checked) {
         selAll.parentElement.style.display = 'block';
       } else {
@@ -69,7 +106,7 @@ var tablesPro = (function () {
       }
       Array.from(document.getElementsByClassName("select-checkbox")).forEach(function (box) {
         box.checked = checked;
-        box.disabled = false;
+        //box.disabled = false;
         highlightRow(box);
       })
       countChecked();
@@ -78,18 +115,18 @@ var tablesPro = (function () {
 
     function selectAll() {
       // Click on Select all highlights all rows and disables checkboxes
-      let checked = this.checked;
+      let checked = selAll.checked
       if (checked) {
         document.getElementById('count').innerText = 'All';
+        selAllPage.disabled = true;
       } else {
         selAllPage.disabled = false;
-        Array.from(document.getElementsByClassName("select-checkbox")).forEach(function (box) {
-          box.checked = true;
-          box.disabled = false;
-          highlightRow(box);
-          countChecked();
-        })
+        //sslAllPage.checked = false;
       }
+      Array.from(document.getElementsByClassName("select-checkbox")).forEach(function (box) {
+        box.disabled = checked;
+      })
+      countChecked();
       lastChecked = null;
     }
 
@@ -161,6 +198,9 @@ var tablesPro = (function () {
 
 // Count the number of checked rows and nake sure they are highlighted
     function countChecked() {
+      if (selAll.checked) {
+        return
+      }
       let checked = Array.from(document.querySelectorAll(".select-checkbox:checked"));
       checked.forEach(function (e) {
         let row = e.parentElement.parentElement
@@ -174,7 +214,7 @@ var tablesPro = (function () {
       let actionMenu = document.getElementById('selectActionMenu');
       if (actionMenu) {
         actionMenu.disabled = (count === 0);
-        actionMenu.enabled = (count > 0);
+        actionMenu.enabled = (count > 0 || selAll.checked);
       }
     }
 
@@ -195,9 +235,23 @@ var tablesPro = (function () {
 
     return tb
   }
+
 )
 ();
-tablesPro.init()
-
-
-
+// document.addEventListener("DOMContentLoaded", (event) =>{
+//   alert("DOM loaded")
+// })
+// window.addEventListener("hashchange", hashchange)
+window.addEventListener("load", tablesPro.init)
+// window.addEventListener("popstate", (event) => {
+//   alert(
+//     `location: ${document.location}, state: ${JSON.stringify(event.state)}`
+//   );
+// });
+//
+// function test() {
+//   alert("onload")
+// }
+// function hashchange(){
+//   alert("hashchange")
+// }

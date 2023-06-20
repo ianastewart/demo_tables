@@ -83,6 +83,14 @@ class TablesProView(SingleTableMixin, FilterView):
     def get(self, request, *args, **kwargs):
         if request.htmx:
             return self.get_htmx(request, *args, **kwargs)
+        table = self.get_table()
+        # If table is responsive and no width sent, tell client to repeat request adding the width parameter
+        if hasattr(table, "Meta") and hasattr(table.Meta, "responsive"):
+            if "_width" in request.GET:
+                self.width = int(request.GET["_width"])
+            else:
+                return render(request, "tables_pro/width_request.html")
+
         if "_export" in request.GET:
             export_format = request.GET.get("_export", self.export_format)
             qs = self.get_queryset()
@@ -102,7 +110,6 @@ class TablesProView(SingleTableMixin, FilterView):
             filename = "Export"
             # Use tablib to export in desired format
             self.object_list = qs
-            table = self.get_table()
             self.preprocess_table(table)
             table.before_render(request)
             exclude_columns = [
@@ -118,23 +125,16 @@ class TablesProView(SingleTableMixin, FilterView):
             return exporter.response(filename=f"{filename}.{export_format}")
         return super().get(request, *args, **kwargs)
 
-    def get_htmx(self, request, *args, **kwargs):
-        if request.htmx.trigger == "media_query":
-            # Client has sent its width as a result of a media-query
-            # Respond with appropriately sized table to replace block_content
-            self.filterset = self.get_filterset(self.get_filterset_class())
-            self.object_list = self.filterset.qs
-            self.width = int(request.GET.get("_width", 0))
-            context = self.get_context_data(
-                filter=self.filterset, object_list=self.object_list
-            )
-            context["breakpoints"] = None
-            response = render(request, "tables_pro/block_content.html", context)
-            response["HX-Retarget"] = "#block_content"
-            response["HX-Reswap"] = "outerHTML"
-            return response
+        # self.object_list - self.get_queryset
+        # context = self.get_context_data(**kwargs)
+        # if "_width" in request.GET:
+        #     context["breakpoints"] = None
+        #     context["mq_response"] = False
+        # return render, self.template_name, context
 
-        elif request.htmx.trigger == "table_data":
+    def get_htmx(self, request, *args, **kwargs):
+
+        if request.htmx.trigger == "table_data":
             # triggered refresh of table data after create or update
             return self.render_template(self.table_data_template_name, *args, **kwargs)
 
@@ -192,7 +192,7 @@ class TablesProView(SingleTableMixin, FilterView):
             return self.render_template(self.table_data_template_name, *args, **kwargs)
 
         elif "id_" in request.htmx.trigger:
-            # filter value changed
+            # Filter value changed
             url = self._update_parameter(
                 request,
                 request.htmx.trigger_name,
@@ -224,7 +224,10 @@ class TablesProView(SingleTableMixin, FilterView):
                 "per_page", self.table_pagination.get("per_page", 25)
             ),
             breakpoints=breakpoints(self.table),
+            width=self.width
         )
+        if "_width" in self.request.GET:
+            context["breakpoints"] = None
         return context
 
     def post(self, request, *args, **kwargs):
@@ -277,7 +280,9 @@ class TablesProView(SingleTableMixin, FilterView):
                 qd["page"] = "2"
             else:
                 qd["page"] = str(int(qd["page"]) + 1)
-        return self.filterset_class(qd, queryset=query_set, request=request).qs
+        if self.filterset_class:
+            return self.filterset_class(qd, queryset=query_set, request=request).qs
+        return query_set
 
     def query_dict(self, request):
         bits = request.htmx.current_url.split("?")
@@ -316,7 +321,7 @@ class TablesProView(SingleTableMixin, FilterView):
         table.infinite_scroll = self.infinite_scroll
         table.infinite_load = self.infinite_load
         table.sticky_header = self.sticky_header
-        # variable that control action when table is clicked
+        # variables that control action when table is clicked
         table.method = self.click_method
         table.url = ""
         table.pk = False
