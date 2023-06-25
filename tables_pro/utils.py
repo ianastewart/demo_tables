@@ -63,8 +63,10 @@ def define_columns(table, width):
                 if width >= breakpoint:
                     key = breakpoint
             col_dict = table.Meta.responsive.get(key, {})
+            # todo attrs
         table.columns_fixed = col_dict.get("fixed", [])
         table.columns_default = col_dict.get("default", table.sequence)
+        table.mobile = col_dict.get("mobile", False)
     if not table.columns_fixed:
         table.columns_fixed = table.sequence[:1]
         if "selection" in table.columns_fixed and len(table.sequence) > 1:
@@ -78,11 +80,11 @@ def set_column_states(table):
     add attribute 'columns_states' - a list of tuples used to create the column dropdown
     Expects 'table.columns_visible' to have been updated beforehand
     """
-    for col in table.sequence:
-        if col in table.columns_visible:
-            table.columns.show(col)
-        else:
-            table.columns.hide(col)
+    # for col in table.sequence:
+    #     if col in table.columns_visible:
+    #         table.columns.show(col)
+    #     else:
+    #         table.columns.hide(col)
     table.column_states = [
         (col, table.columns.columns[col].header, col in table.columns_visible)
         for col in table.columns_optional

@@ -71,7 +71,8 @@ class MovieTable3(tables.Table):
         columns_sm = {
             "fixed": ["selection", "title"],
             "default": ["selection", "title"],
-            "template": "movies/mobile.html"
+            "mobile": True,
+            "attrs": {"th": "strong bg-dark text-white", "tr": "bg-light"},
         }
         responsive = {300: columns_sm, 600: columns_md, 1000: columns_lg}
 

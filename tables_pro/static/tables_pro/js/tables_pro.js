@@ -118,9 +118,9 @@ var tablesPro = (function () {
       let checked = selAll.checked
       if (checked) {
         document.getElementById('count').innerText = 'All';
-        selAllPage.disabled = true;
+        if (selAllPage){selAllPage.disabled = true};
       } else {
-        selAllPage.disabled = false;
+        if (selAllPage){selAllPage.disabled = false};
         //sslAllPage.checked = false;
       }
       Array.from(document.getElementsByClassName("select-checkbox")).forEach(function (box) {
@@ -133,7 +133,7 @@ var tablesPro = (function () {
     function tableClick(e) {
       if (e.target.name === 'select-checkbox') {
         // Click on row's select checkbox - handle using shift to select multiple rows
-        selAllPage.checked = false;
+        if (selAllPage){selAllPage.checked = false};
         // selAll.parentElement.style.display = 'none';
         let chkBox = e.target;
         highlightRow(chkBox);

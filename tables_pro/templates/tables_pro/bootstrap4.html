@@ -13,6 +13,7 @@
             <thead {{ table.attrs.thead.as_html }} style="margin: 0px">
             <tr>
               {% for column in table.columns %}
+                {% if column.name in table.columns_visible %}
                 <th {{ column.attrs.th.as_html }} style="margin: 0px">
                   {% if column.name == "selection" %}
                     <input type="checkbox" id="select_all_page" name="select_all_page" class="ml-2">
@@ -27,6 +28,7 @@
                     {% endif %}
                   {% endif %}
                 </th>
+                {% endif %}
               {% endfor %}
             </tr>
             {% if table.filter.style == table.filter.style.HEADER %}
@@ -53,7 +55,9 @@
             <tfoot {{ table.attrs.tfoot.as_html }}>
             <tr>
               {% for column in table.columns %}
-                <td {{ column.attrs.tf.as_html }}>{{ column.footer }}</td>
+                {% if column.name in table.columns_visible %}
+                  <td {{ column.attrs.tf.as_html }}>{{ column.footer }}</td>
+                {% endif %}
               {% endfor %}
             </tr>
             </tfoot>
