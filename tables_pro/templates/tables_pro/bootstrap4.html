@@ -11,7 +11,7 @@
           {% if table.show_header %}
             {#  sort attributes and filter row #}
             <thead {{ table.attrs.thead.as_html }} style="margin: 0px">
-            <tr>
+            <tr class="bg-white">
               {% for column in table.columns %}
                 {% if column.name in table.columns_visible %}
                 <th {{ column.attrs.th.as_html }} style="margin: 0px">
@@ -32,13 +32,13 @@
               {% endfor %}
             </tr>
             {% if table.filter.style == table.filter.style.HEADER %}
-              <tr>
+              <tr class="bg-light">
                 {% for field in table.header_fields %}
-                  <td>
+                  <th>
                     {% if field %}
-                      {% bootstrap_field field show_label=False form_group_class="form-group hx-get" %}
+                      {% bootstrap_field field show_label=False form_group_class="form-group hx-get m-0 p-0" %}
                     {% endif %}
-                  </td>
+                  </th>
                 {% endfor %}
               </tr>
             {% endif %}

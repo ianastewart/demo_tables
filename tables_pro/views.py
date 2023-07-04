@@ -125,12 +125,6 @@ class TablesProView(SingleTableMixin, FilterView):
             return exporter.response(filename=f"{filename}.{export_format}")
         return super().get(request, *args, **kwargs)
 
-        # self.object_list - self.get_queryset
-        # context = self.get_context_data(**kwargs)
-        # if "_width" in request.GET:
-        #     context["breakpoints"] = None
-        #     context["mq_response"] = False
-        # return render, self.template_name, context
 
     def get_htmx(self, request, *args, **kwargs):
 
@@ -170,7 +164,7 @@ class TablesProView(SingleTableMixin, FilterView):
             bits = request.htmx.trigger.split("_")
             return self.cell_clicked(
                 record_pk=bits[1],
-                column_name=visible_columns(request, self.table_class)[int(bits[2])],
+                column_name=visible_columns(request, self.width, self.table_class)[int(bits[2])],
                 target=request.htmx.target,
             )
 
@@ -237,7 +231,7 @@ class TablesProView(SingleTableMixin, FilterView):
                     bits = request.htmx.target.split("_")
                     return self.cell_changed(
                         record_pk=bits[1],
-                        column_name=visible_columns(request, self.table_class)[
+                        column_name=visible_columns(request, self.width, self.table_class)[
                             int(bits[2])
                         ],
                         target=request.htmx.target,

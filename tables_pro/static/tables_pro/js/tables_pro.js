@@ -2,12 +2,10 @@
 'use strict';
 var tablesPro = (function () {
     let tb = {};
-    console.log("Begin")
     let lastChecked = null
     let selAll = null
     let selAllPage = null
     tb.init = function () {
-      console.log("init")
       let url = new URL(window.location.href)
       const w = url.searchParams.get("_width")
       if(w !== null) {
@@ -31,8 +29,9 @@ var tablesPro = (function () {
       // document.getElementById('select_all_page').addEventListener("click", selectAllPage )
       Array.from(document.getElementsByTagName("table")).forEach(e => e.addEventListener("click", tableClick));
       Array.from(document.querySelectorAll(".auto-submit")).forEach(e => e.addEventListener("change", function () {
-        document.getElementById("id_table_form").submit()
+        document.getElementById("id_filter_form").submit()
       }));
+
       Array.from(document.querySelectorAll(".form-group.hx-get")).forEach(e => e.addEventListener("change", filterChanged))
 
       countChecked()

@@ -80,3 +80,20 @@ class MovieTable3(tables.Table):
     budget = CurrencyColumn(prefix="$")
     revenue = CurrencyColumn(prefix="$")
     runtime = RightAlignedColumn()
+
+
+class MovieTable4(tables.Table):
+    class Meta:
+        model = Movie
+        fields = (
+            "title",
+            "budget",
+            "popularity",
+            "release_date",
+            "revenue",
+            "vote_count",
+        )
+        editable = [
+            "vote_count",
+        ]
+        attrs = {"class": "table table-sm table-hover hover-link"}

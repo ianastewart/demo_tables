@@ -1,12 +1,18 @@
 from django.shortcuts import render, reverse
 from django.contrib import messages
 from django.views.generic import ListView, TemplateView
-from django_htmx.http import HttpResponseClientRedirect, retarget
+from django_htmx.http import (
+    HttpResponseClientRedirect,
+    HttpResponseClientRefresh,
+    retarget,
+)
 from django.http import HttpResponse
 from .models import Movie
+from .forms import MovieForm
 from tables_pro.views import TablesProView, SelectedMixin
-from .tables import MovieTable1, MovieTable2, MovieTable3
+from .tables import MovieTable1, MovieTable2, MovieTable3, MovieTable4
 from .filters import MovieFilter
+from django.utils.safestring import mark_safe
 
 
 class MoviesListView(ListView):
@@ -19,15 +25,15 @@ class MoviesListView(ListView):
         return context
 
 
-class MoviesTable1View(TablesProView):
+class BasicView(TablesProView):
     title = "Basic view"
     table_class = MovieTable1
     template_name = "movies/table.html"
     model = Movie
 
 
-class MoviesTable2View(TablesProView):
-    title = "Row and column setting"
+class RowColSettingsView(TablesProView):
+    title = "Row and column settings"
     table_class = MovieTable1
     template_name = "movies/table.html"
     model = Movie
@@ -42,7 +48,7 @@ class MoviesTable2View(TablesProView):
         return context
 
 
-class MoviesTable3View(TablesProView):
+class SelectActionsView(TablesProView):
     title = "Selection and actions"
     table_class = MovieTable2
     template_name = "movies/table.html"
@@ -87,7 +93,7 @@ class ActionPageView(SelectedMixin, TemplateView):
         return context
 
 
-class MoviesTable4View(TablesProView):
+class InfiniteScollView(TablesProView):
     title = "Infinite scroll"
     table_class = MovieTable1
     template_name = "movies/table.html"
@@ -96,7 +102,7 @@ class MoviesTable4View(TablesProView):
     sticky_header = True
 
 
-class MoviesTable5View(TablesProView):
+class InfiniteLoadView(TablesProView):
     title = "Infinite load more"
     table_class = MovieTable1
     template_name = "movies/table.html"
@@ -105,8 +111,20 @@ class MoviesTable5View(TablesProView):
     sticky_header = True
 
 
-class MoviesTable6View(MoviesTable3View):
+class MoviesFilterToolbarView(SelectActionsView):
     title = "Filter toolbar"
+    table_class = MovieTable3
+    filterset_class = MovieFilter
+    filter_style = TablesProView.FilterStyle.TOOLBAR
+    template_name = "movies/table.html"
+    column_settings = True
+    row_settings = True
+    responsive = True
+    model = Movie
+
+
+class MoviesFilterModalView(SelectActionsView):
+    title = "Filter modal"
     table_class = MovieTable3
     filterset_class = MovieFilter
     filter_style = TablesProView.FilterStyle.MODAL
@@ -115,3 +133,40 @@ class MoviesTable6View(MoviesTable3View):
     row_settings = True
     responsive = True
     model = Movie
+
+
+class MoviesFilterHeaderView(SelectActionsView):
+    title = "Filter in header"
+    table_class = MovieTable3
+    filterset_class = MovieFilter
+    filter_style = TablesProView.FilterStyle.HEADER
+    template_name = "movies/table.html"
+    column_settings = True
+    row_settings = True
+    responsive = True
+    sticky_header = True
+    infinite_scroll = True
+
+
+class MoviesEditableView(TablesProView):
+    title = "Editable columns"
+    model = Movie
+    table_class = MovieTable4
+    template_name = "movies/table.html"
+    column_settings = True
+    row_settings = True
+
+    def cell_clicked(self, record_pk, column_name, target):
+        form = MovieForm()
+        context = {"field": form.fields["vote"]}
+        s = render(self.request, "tables_pro/cell_form.html", context)
+        return s
+
+        # str = f"<input name='vote' id='target' hx-post='' hx-target='#{target}' on_change=doHxPost>"
+        # return HttpResponse(mark_safe(str))
+
+    def cell_changed(self, record_pk, column_name, target):
+        movie = Movie.objects.get(pk=record_pk)
+        movie.column_name = "9999"
+        movie.save()
+        return HttpResponseClientRefresh

@@ -5,6 +5,7 @@ from django_filters import (
     FilterSet,
     ModelChoiceFilter,
     RangeFilter,
+    NumberFilter,
 )
 from movies.models import Movie
 
@@ -16,4 +17,4 @@ class MovieFilter(FilterSet):
         fields = ["title"]
 
     title = CharFilter(field_name="title", lookup_expr="icontains")
-    budget = RangeFilter(field_name="budget")
+    budget = NumberFilter(field_name="budget", lookup_expr="gt")
