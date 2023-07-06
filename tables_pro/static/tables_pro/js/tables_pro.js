@@ -8,9 +8,10 @@ var tablesPro = (function () {
     tb.init = function () {
       let url = new URL(window.location.href)
       const w = url.searchParams.get("_width")
-      if(w !== null) {
-        if (parseInt(w) !== window.outerWidth){
-           window.location.href = window.location.href.replace(`_width=${w}`, `_width=${window.outerWidth}`)        }
+      if (w !== null) {
+        if (parseInt(w) !== window.outerWidth) {
+          window.location.href = window.location.href.replace(`_width=${w}`, `_width=${window.outerWidth}`)
+        }
       }
 
 
@@ -117,9 +118,15 @@ var tablesPro = (function () {
       let checked = selAll.checked
       if (checked) {
         document.getElementById('count').innerText = 'All';
-        if (selAllPage){selAllPage.disabled = true};
+        if (selAllPage) {
+          selAllPage.disabled = true
+        }
+        ;
       } else {
-        if (selAllPage){selAllPage.disabled = false};
+        if (selAllPage) {
+          selAllPage.disabled = false
+        }
+        ;
         //sslAllPage.checked = false;
       }
       Array.from(document.getElementsByClassName("select-checkbox")).forEach(function (box) {
@@ -132,7 +139,10 @@ var tablesPro = (function () {
     function tableClick(e) {
       if (e.target.name === 'select-checkbox') {
         // Click on row's select checkbox - handle using shift to select multiple rows
-        if (selAllPage){selAllPage.checked = false};
+        if (selAllPage) {
+          selAllPage.checked = false
+        }
+        ;
         // selAll.parentElement.style.display = 'none';
         let chkBox = e.target;
         highlightRow(chkBox);
@@ -153,11 +163,14 @@ var tablesPro = (function () {
         countChecked();
 
       } else if (e.target.tagName === 'TD') {
-        let editing = document.getElementById("editing");
-        if (editing) {
-          htmx.ajax('POST', "", {source: '#' + editing.id, target: '#' + editing.id})
+
+        let editing = document.getElementsByClassName("td_editing");
+        if (editing.length > 0) {
+          let el = editing[0].parentNode
+          htmx.ajax('PUT', "", {source: "#" + el.id, target: "#" + el.id, values: htmx.closest(el, 'tr')})
         } else {
           let row = e.target.parentNode;
+          let id = row.id.slice(3);
           let table = row.parentNode.parentNode;
           let col = 0;
           let previous = e.target.previousElementSibling;
@@ -165,7 +178,9 @@ var tablesPro = (function () {
             previous = previous.previousElementSibling;
             col += 1;
           }
-          let id = row.id.slice(3);
+          let tdId = ("td" + "_" + id + "_" + col + "_" + window.outerWidth);
+
+
           if (table.dataset.url) {
             let url = table.dataset.url;
             if (table.dataset.pk) {
@@ -177,7 +192,6 @@ var tablesPro = (function () {
               htmx.ajax('GET', url, {source: '#' + row.id, target: table.dataset.target});
             }
           } else if (e.target.classList.contains("td_edit")) {
-            let tdId = ("td" + "_" + id + "_" + col);
             e.target.setAttribute("id", tdId);
             htmx.ajax('GET', "", {source: '#' + tdId, target: '#' + tdId});
           }

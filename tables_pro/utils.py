@@ -29,13 +29,16 @@ def set_column(
     return columns
 
 
-def visible_columns(request: HttpRequest, width, table_class):
+def visible_columns(request: HttpRequest, table_class, width):
     """
-    return list of visible columns in correct sequence
+    Return the list of visible column names in correct sequence
     """
-    sequence = table_class(data=[]).sequence
+    table = table_class(data=[])
+    define_columns(table, width)
+    if not table.responsive:
+        width = 0
     columns = load_columns(request, width)
-    return [col for col in sequence if col in columns]
+    return [col for col in table.sequence if col in columns]
 
 
 def define_columns(table, width):
@@ -80,11 +83,6 @@ def set_column_states(table):
     add attribute 'columns_states' - a list of tuples used to create the column dropdown
     Expects 'table.columns_visible' to have been updated beforehand
     """
-    # for col in table.sequence:
-    #     if col in table.columns_visible:
-    #         table.columns.show(col)
-    #     else:
-    #         table.columns.hide(col)
     table.column_states = [
         (col, table.columns.columns[col].header, col in table.columns_visible)
         for col in table.columns_optional

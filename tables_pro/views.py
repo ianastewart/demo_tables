@@ -125,7 +125,6 @@ class TablesProView(SingleTableMixin, FilterView):
             return exporter.response(filename=f"{filename}.{export_format}")
         return super().get(request, *args, **kwargs)
 
-
     def get_htmx(self, request, *args, **kwargs):
 
         if request.htmx.trigger == "table_data":
@@ -164,7 +163,9 @@ class TablesProView(SingleTableMixin, FilterView):
             bits = request.htmx.trigger.split("_")
             return self.cell_clicked(
                 record_pk=bits[1],
-                column_name=visible_columns(request, self.width, self.table_class)[int(bits[2])],
+                column_name=visible_columns(request, self.table_class, self.width)[
+                    int(bits[2])
+                ],
                 target=request.htmx.target,
             )
 
@@ -218,26 +219,28 @@ class TablesProView(SingleTableMixin, FilterView):
                 "per_page", self.table_pagination.get("per_page", 25)
             ),
             breakpoints=breakpoints(self.table),
-            width=self.width
+            width=self.width,
         )
         if "_width" in self.request.GET:
             context["breakpoints"] = None
         return context
 
-    def post(self, request, *args, **kwargs):
-        if request.htmx:
-            if request.htmx.target:
-                if "td_" in request.htmx.target:
-                    bits = request.htmx.target.split("_")
-                    return self.cell_changed(
-                        record_pk=bits[1],
-                        column_name=visible_columns(request, self.width, self.table_class)[
-                            int(bits[2])
-                        ],
-                        target=request.htmx.target,
-                    )
+    def put(self, request, *args, **kwargs):
+        # PUT is used to update a cell after inline editing
+        params = QueryDict(request.body)
+        bits = request.htmx.target.split("_")
+        column_name = visible_columns(request, self.table_class, int(bits[3]))[
+            int(bits[2])
+        ]
+        return self.cell_changed(
+            record_pk=bits[1],
+            column_name=column_name,
+            value=params[column_name],
+            target=request.htmx.target,
+        )
 
-        # It's an action performed on a queryset`
+    def post(self, request, *args, **kwargs):
+        # Posts are an action performed on a queryset
         if "select_all" in request.POST:
             subset = "all"
             self.selected_ids = []
@@ -303,7 +306,7 @@ class TablesProView(SingleTableMixin, FilterView):
         """User clicked on a cell"""
         return HttpResponseClientRefresh()
 
-    def cell_changed(self, record_pk, column_name, target):
+    def cell_changed(self, record_pk, column_name, value, target):
         """Cell value changed"""
         return HttpResponseClientRefresh()
 
