@@ -13,9 +13,6 @@ var tablesPro = (function () {
           window.location.href = window.location.href.replace(`_width=${w}`, `_width=${window.outerWidth}`)
         }
       }
-
-
-      //window.addEventListener("load", onLoad)
       selAll = document.getElementById('select_all')
       selAllPage = document.getElementById('select_all_page')
       if (selAllPage) {
@@ -34,7 +31,6 @@ var tablesPro = (function () {
       }));
 
       Array.from(document.querySelectorAll(".form-group.hx-get")).forEach(e => e.addEventListener("change", filterChanged))
-
       countChecked()
       document.body.addEventListener("trigger", function (evt) {
         htmx.ajax('GET', evt.detail.url, {source: '#table_data', 'target': '#table_data'});
@@ -230,21 +226,20 @@ var tablesPro = (function () {
         actionMenu.enabled = (count > 0 || selAll.checked);
       }
     }
+// function windowSize():
+// htmx
 
-    // function windowSize():
-    // htmx
-
-    // function setMobileTable(selector) {
-    //     // if (window.innerWidth > 600) return false;
-    //     const tableEl = document.querySelector(selector);
-    //     const thEls = tableEl.querySelectorAll('thead th');
-    //     const tdLabels = Array.from(thEls).map(el => el.innerText);
-    //     tableEl.querySelectorAll('tbody tr').forEach(tr => {
-    //         Array.from(tr.children).forEach(
-    //             (td, ndx) => td.setAttribute('label', tdLabels[ndx])
-    //         );
-    //     });
-    // }
+// function setMobileTable(selector) {
+//     // if (window.innerWidth > 600) return false;
+//     const tableEl = document.querySelector(selector);
+//     const thEls = tableEl.querySelectorAll('thead th');
+//     const tdLabels = Array.from(thEls).map(el => el.innerText);
+//     tableEl.querySelectorAll('tbody tr').forEach(tr => {
+//         Array.from(tr.children).forEach(
+//             (td, ndx) => td.setAttribute('label', tdLabels[ndx])
+//         );
+//     });
+// }
 
     return tb
   }
@@ -256,6 +251,7 @@ var tablesPro = (function () {
 // })
 // window.addEventListener("hashchange", hashchange)
 window.addEventListener("load", tablesPro.init)
+tablesPro.show()
 // window.addEventListener("popstate", (event) => {
 //   alert(
 //     `location: ${document.location}, state: ${JSON.stringify(event.state)}`

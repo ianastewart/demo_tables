@@ -28,6 +28,10 @@ from tables_pro.utils import (
 logger = logging.getLogger(__name__)
 
 
+class ConfigurationError(Exception):
+    pass
+
+
 class TablesProView(SingleTableMixin, FilterView):
     class FilterStyle(IntEnum):
         NONE = 0
@@ -40,6 +44,9 @@ class TablesProView(SingleTableMixin, FilterView):
     filter_template_name = "tables_pro/modal_filter.html"
     table_data_template_name = "tables_pro/render_table_data.html"
     rows_template_name = "tables_pro/render_rows.html"
+
+    model = None
+    form_class = None
 
     context_filter_name = "filter"
     table_pagination = {"per_page": 10}
@@ -81,8 +88,6 @@ class TablesProView(SingleTableMixin, FilterView):
         return self.dataset_kwargs
 
     def get(self, request, *args, **kwargs):
-        if request.htmx:
-            return self.get_htmx(request, *args, **kwargs)
         table = self.get_table()
         # If table is responsive and no width sent, tell client to repeat request adding the width parameter
         if hasattr(table, "Meta") and hasattr(table.Meta, "responsive"):
@@ -90,6 +95,9 @@ class TablesProView(SingleTableMixin, FilterView):
                 self.width = int(request.GET["_width"])
             else:
                 return render(request, "tables_pro/width_request.html")
+
+        if request.htmx:
+            return self.get_htmx(request, *args, **kwargs)
 
         if "_export" in request.GET:
             export_format = request.GET.get("_export", self.export_format)
@@ -250,20 +258,23 @@ class TablesProView(SingleTableMixin, FilterView):
             self.selected_ids = request.POST.getlist("select-checkbox")
             self.selected_objects = self.get_queryset().filter(pk__in=self.selected_ids)
 
-        if "export" in request.htmx.trigger_name:
-            # Export is a special case which must redirect to a regular GET that returns the file
-            request.session["selected_ids"] = self.selected_ids
-            bits = request.htmx.trigger_name.split("_")
-            export_format = bits[1] if len(bits) > 1 else "csv"
-            path = request.path + request.POST["query"]
-            if len(request.POST["query"]) > 1:
-                path += "&"
-            return HttpResponseClientRedirect(
-                f"{path}_export={export_format}&_subset={subset}"
-            )
+        if request.htmx.trigger_name:
+            if "export" in request.htmx.trigger_name:
+                # Export is a special case which must redirect to a regular GET that returns the file
+                request.session["selected_ids"] = self.selected_ids
+                bits = request.htmx.trigger_name.split("_")
+                export_format = bits[1] if len(bits) > 1 else "csv"
+                path = request.path + request.POST["query"]
+                if len(request.POST["query"]) > 1:
+                    path += "&"
+                return HttpResponseClientRedirect(
+                    f"{path}_export={export_format}&_subset={subset}"
+                )
 
-        response = self.handle_action(request, request.htmx.trigger_name)
-        return response if response else HttpResponseClientRefresh()
+            response = self.handle_action(request, request.htmx.trigger_name)
+            if response:
+                return response
+        return HttpResponseClientRefresh()
 
     def get_export_format(self):
         return self.export_format
@@ -303,11 +314,35 @@ class TablesProView(SingleTableMixin, FilterView):
         return HttpResponseClientRefresh()
 
     def cell_clicked(self, record_pk, column_name, target):
-        """User clicked on a cell"""
-        return HttpResponseClientRefresh()
+        """User clicked on an editable cell"""
+        if not self.model:
+            raise ConfigurationError(
+                "Model must be specified or cell_clicked must be overriden for editable cells",
+            )
+        if not self.form_class:
+            raise ConfigurationError(
+                "You must specify the form_class for editable cells"
+            )
+        try:
+            record = self.model.objects.get(pk=record_pk)
+            form = self.form_class({column_name: getattr(record, column_name)})
+            context = {"field": form[column_name], "target": target}
+            return render(self.request, "tables_pro/cell_form.html", context)
+        except Exception as e:
+            raise ValueError(f"Error {str(e)} while editing field {column_name}")
 
     def cell_changed(self, record_pk, column_name, value, target):
-        """Cell value changed"""
+        """Editable cell value changed"""
+        try:
+            record = self.model.objects.get(pk=record_pk)
+            setattr(record, column_name, value)
+            record.save()
+        except ValueError:
+            return render(
+                self.request,
+                "tables_pro/error_tooltip.html",
+                {"error": "Value error", "column": column_name, "target": target},
+            )
         return HttpResponseClientRefresh()
 
     def preprocess_table(self, table, _filter=None):

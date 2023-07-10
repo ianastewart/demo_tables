@@ -1,5 +1,1 @@
-{% load bootstrap4 %}
-{% bootstrap_field field show_label='sr-only' show_help=False size="small" form_group_class="m0 td_editing" %}
-
-
-{#<input id="cell_edit" hx-post="" hx-target="#{{ target }}" hx-trigger="change" name="vote_count">#}
+<input class="td_editing" style="width: 90px;" hx-put="" hx-target="#{{ target }}" hx-trigger="blur" name="{{ field.name }}" value="{{ field.value }}">

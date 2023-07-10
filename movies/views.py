@@ -151,30 +151,28 @@ class MoviesFilterHeaderView(SelectActionsView):
 class MoviesEditableView(TablesProView):
     title = "Editable columns"
     model = Movie
+    form_class = MovieForm
     table_class = MovieTable4
     template_name = "movies/table.html"
     column_settings = True
     row_settings = True
 
-    def cell_clicked(self, record_pk, column_name, target):
-        movie = Movie.objects.get(pk=record_pk)
-        form = MovieForm({column_name: getattr(movie, column_name)})
-        context = {"field": form[column_name], "target": target}
-        s = render(self.request, "tables_pro/cell_form.html", context)
-        return s
+    # def cell_clicked(self, record_pk, column_name, target):
+    #     movie = Movie.objects.get(pk=record_pk)
+    #     form = MovieForm({column_name: getattr(movie, column_name)})
+    #     context = {"field": form[column_name], "target": target}
+    #     s = render(self.request, "tables_pro/cell_form.html", context)
+    #     return s
 
-        # str = f"<input name='vote' id='target' hx-post='' hx-target='#{target}' on_change=doHxPost>"
-        # return HttpResponse(mark_safe(str))
-
-    def cell_changed(self, record_pk, column_name, value, target):
-        try:
-            movie = Movie.objects.get(pk=record_pk)
-            setattr(movie, column_name, value)
-            movie.save()
-        except ValueError:
-            return render(
-                self.request,
-                "tables_pro/cell_error.html",
-                {"error": "Value error", "column": column_name},
-            )
-        return HttpResponseClientRefresh()
+    # def cell_changed(self, record_pk, column_name, value, target):
+    #     try:
+    #         movie = Movie.objects.get(pk=record_pk)
+    #         setattr(movie, column_name, value)
+    #         movie.save()
+    #     except ValueError:
+    #         return render(
+    #             self.request,
+    #             "tables_pro/cell_error.html",
+    #             {"error": "Value error", "column": column_name},
+    #         )
+    #     return HttpResponseClientRefresh()

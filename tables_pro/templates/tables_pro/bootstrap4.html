@@ -14,20 +14,20 @@
             <tr class="bg-white">
               {% for column in table.columns %}
                 {% if column.name in table.columns_visible %}
-                <th {{ column.attrs.th.as_html }} style="margin: 0px">
-                  {% if column.name == "selection" %}
-                    <input type="checkbox" id="select_all_page" name="select_all_page" class="ml-2">
-                  {% else %}
-                    {% if column.orderable %}
-                      <a href="{% querystring table.prefixed_order_by_field=column.order_by_alias.next %}">
-                        {#            <span class="float-right text-white">{% if "-" in column.order_by.0 %}&#9651;{% else %}&#9661;{% endif %}</span>#}
-                        {{ column.header }}
-                      </a>
+                  <th {{ column.attrs.th.as_html }} style="margin: 0px">
+                    {% if column.name == "selection" %}
+                      <input type="checkbox" id="select_all_page" name="select_all_page" class="ml-2">
                     {% else %}
-                      {{ column.header }}
+                      {% if column.orderable %}
+                        <a href="{% querystring table.prefixed_order_by_field=column.order_by_alias.next %}">
+                          {#            <span class="float-right text-white">{% if "-" in column.order_by.0 %}&#9651;{% else %}&#9661;{% endif %}</span>#}
+                          {{ column.header }}
+                        </a>
+                      {% else %}
+                        {{ column.header }}
+                      {% endif %}
                     {% endif %}
-                  {% endif %}
-                </th>
+                  </th>
                 {% endif %}
               {% endfor %}
             </tr>
@@ -47,7 +47,7 @@
         {% endblock table.thead %}
         {% block table.tbody %}
           <tbody {{ table.attrs.tbody.as_html }}>
-            {% include "tables_pro/render_rows.html" %}
+          {% include "tables_pro/render_rows.html" %}
           </tbody>
         {% endblock table.tbody %}
         {% block table.tfoot %}
@@ -67,8 +67,13 @@
     {% endblock table %}
     {% block pagination %}
       {% if not table.infinite_scroll and not table.infinite_load %}
-      {% include "tables_pro/paginator.html" %}
+        {% include "tables_pro/paginator.html" %}
       {% endif %}
     {% endblock pagination %}
+  </div>
+  <div id="field" aria-describedby="tooltip"></div>
+  <div id="tooltip" role="tooltip">
+    Error in field
+    <div id="arrow" data-popper-arrow></div>
   </div>
 {% endblock table-wrapper %}

@@ -92,6 +92,7 @@ class MovieTable4(tables.Table):
             "release_date",
             "revenue",
             "vote_count",
+            "movie_status",
         )
         editable = [
             "vote_count",
