@@ -1,6 +1,6 @@
 from django.shortcuts import render, reverse
 from django.contrib import messages
-from django.views.generic import ListView, TemplateView
+from django.views.generic import ListView, TemplateView, DetailView
 from django_htmx.http import (
     HttpResponseClientRedirect,
     HttpResponseClientRefresh,
@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from .models import Movie
 from .forms import MovieForm
 from tables_pro.views import TablesProView, SelectedMixin
-from .tables import MovieTable1, MovieTable2, MovieTable3, MovieTable4
+from .tables import MovieTable, MovieTableSelection, MovieTableResponsive, MovieTable4
 from .filters import MovieFilter
 from django.utils.safestring import mark_safe
 
@@ -27,14 +27,14 @@ class MoviesListView(ListView):
 
 class BasicView(TablesProView):
     title = "Basic view"
-    table_class = MovieTable1
+    table_class = MovieTable
     template_name = "movies/table.html"
     model = Movie
 
 
 class RowColSettingsView(TablesProView):
     title = "Row and column settings"
-    table_class = MovieTable1
+    table_class = MovieTable
     template_name = "movies/table.html"
     model = Movie
     row_settings = True
@@ -50,7 +50,7 @@ class RowColSettingsView(TablesProView):
 
 class SelectActionsView(TablesProView):
     title = "Selection and actions"
-    table_class = MovieTable2
+    table_class = MovieTableSelection
     template_name = "movies/table.html"
     model = Movie
 
@@ -95,7 +95,7 @@ class ActionPageView(SelectedMixin, TemplateView):
 
 class InfiniteScollView(TablesProView):
     title = "Infinite scroll"
-    table_class = MovieTable1
+    table_class = MovieTable
     template_name = "movies/table.html"
     model = Movie
     infinite_scroll = True
@@ -104,16 +104,16 @@ class InfiniteScollView(TablesProView):
 
 class InfiniteLoadView(TablesProView):
     title = "Infinite load more"
-    table_class = MovieTable1
+    table_class = MovieTable
     template_name = "movies/table.html"
     model = Movie
     infinite_load = True
     sticky_header = True
 
 
-class MoviesFilterToolbarView(SelectActionsView):
+class MoviesFilterToolbarView(TablesProView):
     title = "Filter toolbar"
-    table_class = MovieTable3
+    table_class = MovieTable
     filterset_class = MovieFilter
     filter_style = TablesProView.FilterStyle.TOOLBAR
     template_name = "movies/table.html"
@@ -125,7 +125,7 @@ class MoviesFilterToolbarView(SelectActionsView):
 
 class MoviesFilterModalView(SelectActionsView):
     title = "Filter modal"
-    table_class = MovieTable3
+    table_class = MovieTableResponsive
     filterset_class = MovieFilter
     filter_style = TablesProView.FilterStyle.MODAL
     template_name = "movies/table.html"
@@ -137,13 +137,13 @@ class MoviesFilterModalView(SelectActionsView):
 
 class MoviesFilterHeaderView(SelectActionsView):
     title = "Filter in header"
-    table_class = MovieTable3
+    table_class = MovieTableResponsive
     filterset_class = MovieFilter
     filter_style = TablesProView.FilterStyle.HEADER
     template_name = "movies/table.html"
     column_settings = True
     row_settings = True
-    responsive = True
+    #responsive = True
     sticky_header = True
     infinite_scroll = True
 
@@ -157,22 +157,40 @@ class MoviesEditableView(TablesProView):
     column_settings = True
     row_settings = True
 
-    # def cell_clicked(self, record_pk, column_name, target):
-    #     movie = Movie.objects.get(pk=record_pk)
-    #     form = MovieForm({column_name: getattr(movie, column_name)})
-    #     context = {"field": form[column_name], "target": target}
-    #     s = render(self.request, "tables_pro/cell_form.html", context)
-    #     return s
 
-    # def cell_changed(self, record_pk, column_name, value, target):
-    #     try:
-    #         movie = Movie.objects.get(pk=record_pk)
-    #         setattr(movie, column_name, value)
-    #         movie.save()
-    #     except ValueError:
-    #         return render(
-    #             self.request,
-    #             "tables_pro/cell_error.html",
-    #             {"error": "Value error", "column": column_name},
-    #         )
-    #     return HttpResponseClientRefresh()
+class MoviesRowClickView(TablesProView):
+    title = "Click row shows detail page"
+    template_name = "movies/table.html"
+    table_class = MovieTableResponsive
+    model = Movie
+    click_url_name = "movie_detail"
+
+
+class MoviesRowClickModalView(TablesProView):
+    title = "Click row shows detail modal "
+    template_name = "movies/table.html"
+    table_class = MovieTableResponsive
+    model = Movie
+    click_url_name = "movie_modal"
+    click_method = "hxget"
+
+
+class MovieDetailView(DetailView):
+    title = "Movie detail view"
+    template_name = "movies/movie_detail.html"
+    model = Movie
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["return"] = self.request.META["HTTP_REFERER"]
+        return context
+
+
+class MovieModalView(DetailView):
+    template_name = "movies/movie_modal.html"
+    model = Movie
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["return"] = self.request.GET.get("return")
+        return context

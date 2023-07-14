@@ -41,18 +41,22 @@ class TablesProView(SingleTableMixin, FilterView):
 
     title = ""
     template_name = "tables_pro/tables_pro.html"
-    filter_template_name = "tables_pro/modal_filter.html"
-    table_data_template_name = "tables_pro/render_table_data.html"
-    rows_template_name = "tables_pro/render_rows.html"
+    templates = {
+        "filter": "tables_pro/modal_filter.html",
+        "table_data": "tables_pro/render_table_data.html",
+        "rows": "tables_pro/render_rows.html",
+        "cell_form": "tables_pro/cell_form.html",
+        "cell_error": "tables_pro/cell_error.html",
+    }
 
     model = None
     form_class = None
 
-    context_filter_name = "filter"
     table_pagination = {"per_page": 10}
     infinite_scroll = False
     infinite_load = False
     #
+    context_filter_name = "filter"
     filter_style = FilterStyle.TOOLBAR
     filter_button = False  # only relevant for TOOLBAR style
     #
@@ -73,23 +77,24 @@ class TablesProView(SingleTableMixin, FilterView):
     dataset_kwargs = None
 
     export_formats = (TableExport.CSV,)
-    width = 0
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.table = None
+        self.width = 0
         self.selected_objects = None
         self.selected_ids = None
 
     def get_export_filename(self, export_format):
-        return "{}.{}".format(self.export_name, export_format)
+        return f"{self.export_name}.{export_format}"
 
     def get_dataset_kwargs(self):
         return self.dataset_kwargs
 
     def get(self, request, *args, **kwargs):
         table = self.get_table()
-        # If table is responsive and no width sent, tell client to repeat request adding the width parameter
+        # If table is responsive and no width parameter was sent,
+        # tell client to repeat request adding the width parameter
         if hasattr(table, "Meta") and hasattr(table.Meta, "responsive"):
             if "_width" in request.GET:
                 self.width = int(request.GET["_width"])
@@ -137,16 +142,16 @@ class TablesProView(SingleTableMixin, FilterView):
 
         if request.htmx.trigger == "table_data":
             # triggered refresh of table data after create or update
-            return self.render_template(self.table_data_template_name, *args, **kwargs)
+            return self.render_template(self.templates["table_data"], *args, **kwargs)
 
         elif request.htmx.trigger_name == "filter" and self.filterset_class:
             # show filter modal
             context = {"filter": self.filterset_class(request.GET)}
-            return render(request, self.filter_template_name, context)
+            return render(request, self.templates["filter"], context)
 
         elif request.htmx.trigger_name == "filter_form":
             # a filter value was changed
-            return self.render_template(self.table_data_template_name, *args, **kwargs)
+            return self.render_template(self.templates["table_data"], *args, **kwargs)
 
         elif "id_row" in request.htmx.trigger:
             # change number of rows to display
@@ -158,19 +163,19 @@ class TablesProView(SingleTableMixin, FilterView):
         elif "tr_" in request.htmx.trigger:
             # infinite scroll/load_more or click on row
             if "_scroll" in request.GET:
-                return self.render_template(self.rows_template_name, *args, **kwargs)
+                return self.render_template(self.templates["rows"], *args, **kwargs)
 
             return self.row_clicked(
-                request.htmx.trigger.split("_")[1],
-                request.htmx.target,
-                request.htmx.current_url,
+                pk=request.htmx.trigger.split("_")[1],
+                target=request.htmx.target,
+                return_url=request.htmx.current_url,
             )
 
         elif "td_" in request.htmx.trigger:
             # cell clicked
             bits = request.htmx.trigger.split("_")
             return self.cell_clicked(
-                record_pk=bits[1],
+                pk=bits[1],
                 column_name=visible_columns(request, self.table_class, self.width)[
                     int(bits[2])
                 ],
@@ -192,7 +197,7 @@ class TablesProView(SingleTableMixin, FilterView):
             col_name = request.htmx.trigger_name[5:]
             checked = request.htmx.trigger_name in request.GET
             set_column(request, self.width, col_name, checked)
-            return self.render_template(self.table_data_template_name, *args, **kwargs)
+            return self.render_template(self.templates["table_data"], *args, **kwargs)
 
         elif "id_" in request.htmx.trigger:
             # Filter value changed
@@ -309,11 +314,11 @@ class TablesProView(SingleTableMixin, FilterView):
         """
         return None
 
-    def row_clicked(self, pk, target, url):
-        """User clicked on a row"""
+    def row_clicked(self, pk, target, return_url):
+        """User clicked on a row without defining a click_url"""
         return HttpResponseClientRefresh()
 
-    def cell_clicked(self, record_pk, column_name, target):
+    def cell_clicked(self, pk, column_name, target):
         """User clicked on an editable cell"""
         if not self.model:
             raise ConfigurationError(
@@ -324,10 +329,10 @@ class TablesProView(SingleTableMixin, FilterView):
                 "You must specify the form_class for editable cells"
             )
         try:
-            record = self.model.objects.get(pk=record_pk)
+            record = self.model.objects.get(pk=pk)
             form = self.form_class({column_name: getattr(record, column_name)})
             context = {"field": form[column_name], "target": target}
-            return render(self.request, "tables_pro/cell_form.html", context)
+            return render(self.request, self.templates["cell_form"], context)
         except Exception as e:
             raise ValueError(f"Error {str(e)} while editing field {column_name}")
 
@@ -340,7 +345,7 @@ class TablesProView(SingleTableMixin, FilterView):
         except ValueError:
             return render(
                 self.request,
-                "tables_pro/error_tooltip.html",
+                self.templates["cell_error"],
                 {"error": "Value error", "column": column_name, "target": target},
             )
         return HttpResponseClientRefresh()
@@ -394,14 +399,6 @@ class TablesProView(SingleTableMixin, FilterView):
                             table.header_fields.append(table.filter.form[col])
                         else:
                             table.header_fields.append(None)
-        # if self.sticky_header:
-        #     thead_attrs = table.Meta.attrs.get("thead", None)
-        #     if thead_attrs:
-        #         thead_class = thead_attrs.get("class", None)
-        #         if thead_class:
-        #             for col in table.columns.columns.values():
-        #                 th_class = col.attrs["th"].get("class", "")
-        #                 col.attrs["th"]["class"] = th_class + f" {thead_class}"
 
     def render_template(self, template_name, *args, **kwargs):
         saved = self.template_name
@@ -430,7 +427,7 @@ class SelectedMixin:
 
     def get_query_set(self):
         if self.model is None:
-            raise ValueError("Model must be specified for SelectedMixin")
+            raise ConfigurationError("Model must be specified for SelectedMixin")
         ids = self.request.session.get("selected_ids", [])
         if ids:
             return self.model.objects.filter(id__in=ids)

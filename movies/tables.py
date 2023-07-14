@@ -3,7 +3,7 @@ from tables_pro.columns import CurrencyColumn, RightAlignedColumn, SelectionColu
 from movies.models import Movie
 
 
-class MovieTable1(tables.Table):
+class MovieTable(tables.Table):
     class Meta:
         model = Movie
         fields = (
@@ -15,8 +15,8 @@ class MovieTable1(tables.Table):
             "runtime",
         )
         attrs = {
-            "class": "table table-sm table-hover hover-link",
-            "thead": {"class": "bg-light border-top border-bottom"},
+            "class": "table table-sm ",
+         #   "thead": {"class": "bg-light border-top border-bottom"},
         }
 
     budget = CurrencyColumn(prefix="$")
@@ -24,7 +24,7 @@ class MovieTable1(tables.Table):
     runtime = RightAlignedColumn()
 
 
-class MovieTable2(tables.Table):
+class MovieTableSelection(tables.Table):
     class Meta:
         model = Movie
         fields = (
@@ -47,7 +47,7 @@ class MovieTable2(tables.Table):
     runtime = RightAlignedColumn()
 
 
-class MovieTable3(tables.Table):
+class MovieTableResponsive(tables.Table):
     class Meta:
         model = Movie
         fields = (

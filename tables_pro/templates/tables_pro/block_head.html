@@ -21,6 +21,12 @@
     .td_edit:hover {
         background-color: floralwhite;
     }
+    {% if view.click_url_name %}
+      tr:hover {
+        cursor: pointer;
+        background-color: floralwhite;
+      }
+    {% endif %}
 @media screen and (max-width: 600px) {
     table {width:100%}
     thead {display: none;}

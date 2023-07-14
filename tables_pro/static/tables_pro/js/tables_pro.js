@@ -1,6 +1,6 @@
 // Handle checkboxes in tables, and modal forms
 'use strict';
-var tablesPro = (function () {
+let tablesPro = (function () {
     let tb = {};
     let lastChecked = null
     let selAll = null
@@ -33,59 +33,12 @@ var tablesPro = (function () {
       Array.from(document.querySelectorAll(".form-group.hx-get")).forEach(e => e.addEventListener("change", filterChanged))
       countChecked()
       document.body.addEventListener("trigger", function (evt) {
-        htmx.ajax('GET', evt.detail.url, {source: '#table_data', 'target': '#table_data'});
+        window.htmx.ajax('GET', evt.detail.url, {source: '#table_data', 'target': '#table_data'});
       })
-      // if (window.matchMedia("(max-width: 768px)").matches) {
-      //     setMobileTable("table")
-      // }
     }
-
-    function removeURLParameter(url, parameter) {
-      //prefer to use l.search if you have a location/link object
-      var urlparts = url.split('?');
-      if (urlparts.length >= 2) {
-
-        var prefix = encodeURIComponent(parameter) + '=';
-        var pars = urlparts[1].split(/[&;]/g);
-
-        //reverse iteration as may be destructive
-        for (var i = pars.length; i-- > 0;) {
-          //idiom for string.startsWith
-          if (pars[i].lastIndexOf(prefix, 0) !== -1) {
-            pars.splice(i, 1);
-          }
-        }
-
-        return urlparts[0] + (pars.length > 0 ? '?' + pars.join('&') : '');
-      }
-      return url;
-    }
-
-    // tb.onload = function() {
-    // function onLoad() {
-    //   init()
-    //   console.log("onLoad")
-    //   countChecked()
-    //   if (selAll) {
-    //     if (selAll.checked) {
-    //       Array.from(document.getElementsByClassName("select-checkbox")).forEach(function (box) {
-    //         box.checked = true;
-    //         box.disabled = false;
-    //         highlightRow(box);
-    //       })
-    //       selAll.parentElement.style.display = 'block';
-    //       document.getElementById('count').innerText = 'All';
-    //       document.getElementById('select_all_page').disabled = true;
-    //       Array.from(document.getElementsByClassName("select-checkbox")).forEach(function (box) {
-    //         box.disabled = true;
-    //       })
-    //     }
-    //   }
-    // }
-
 
     function filterChanged() {
-      htmx.ajax('GET', '', {source: '#' + this.lastChild.id, target: '#table_data'});
+      window.htmx.ajax('GET', '', {source: '#' + this.lastChild.id, target: '#table_data'});
     }
 
     function checkBoxes() {
@@ -94,19 +47,23 @@ var tablesPro = (function () {
 
     function selectAllPage() {
       // Click on 'Select all on page' highlights all rows
-      let checked = selAllPage.checked
-      if (checked) {
-        selAll.parentElement.style.display = 'block';
-      } else {
-        selAll.parentElement.style.display = 'none';
+      if (selAllPage) {
+        let checked = selAllPage.checked
+        if (selAll) {
+          if (checked) {
+            selAll.parentElement.style.display = 'block';
+          } else {
+            selAll.parentElement.style.display = 'none';
+          }
+        }
+        Array.from(document.getElementsByClassName("select-checkbox")).forEach(function (box) {
+          box.checked = checked
+          //box.disabled = false;
+          highlightRow(box)
+        })
+        countChecked()
+        lastChecked = null
       }
-      Array.from(document.getElementsByClassName("select-checkbox")).forEach(function (box) {
-        box.checked = checked;
-        //box.disabled = false;
-        highlightRow(box);
-      })
-      countChecked();
-      lastChecked = null;
     }
 
     function selectAll() {
@@ -133,63 +90,71 @@ var tablesPro = (function () {
     }
 
     function tableClick(e) {
-      if (e.target.name === 'select-checkbox') {
-        // Click on row's select checkbox - handle using shift to select multiple rows
-        if (selAllPage) {
-          selAllPage.checked = false
-        }
-        ;
-        // selAll.parentElement.style.display = 'none';
-        let chkBox = e.target;
-        highlightRow(chkBox);
-        if (!lastChecked) {
-          lastChecked = chkBox;
-        } else if (e.shiftKey) {
-          let chkBoxes = checkBoxes();
-          let start = chkBoxes.indexOf(chkBox);
-          let end = chkBoxes.indexOf(lastChecked);
-          chkBoxes.slice(Math.min(start, end), Math.max(start, end) + 1).forEach(function (box) {
-            box.checked = chkBox.checked;
-            // highlightRow(box)
-          });
-          lastChecked = chkBox;
-        } else {
-          lastChecked = chkBox;
-        }
-        countChecked();
-
-      } else if (e.target.tagName === 'TD') {
-
-        let editing = document.getElementsByClassName("td_editing");
-        if (editing.length > 0) {
-          let el = editing[0].parentNode
-          htmx.ajax('PUT', "", {source: "#" + el.id, target: "#" + el.id, values: htmx.closest(el, 'tr')})
-        } else {
-          let row = e.target.parentNode;
-          let id = row.id.slice(3);
-          let table = row.parentNode.parentNode;
-          let col = 0;
-          let previous = e.target.previousElementSibling;
-          while (previous) {
-            previous = previous.previousElementSibling;
-            col += 1;
+      // ignore clicks in td holding select checkbox
+      if (e.target.innerHTML.search('select-checkbox') < 0) {
+        if (e.target.name === 'select-checkbox') {
+          // Click on row's select checkbox - handle using shift to select multiple rows
+          if (selAllPage) {
+            selAllPage.checked = false
           }
-          let tdId = ("td" + "_" + id + "_" + col + "_" + window.outerWidth);
+          // selAll.parentElement.style.display = 'none';
+          let chkBox = e.target
+          highlightRow(chkBox)
+          if (!lastChecked) {
+            lastChecked = chkBox
+          } else if (e.shiftKey) {
+            let chkBoxes = checkBoxes()
+            let start = chkBoxes.indexOf(chkBox)
+            let end = chkBoxes.indexOf(lastChecked)
+            chkBoxes.slice(Math.min(start, end), Math.max(start, end) + 1).forEach(function (box) {
+              box.checked = chkBox.checked;
+              // highlightRow(box)
+            });
+            lastChecked = chkBox;
+          } else {
+            lastChecked = chkBox;
+          }
+          countChecked();
 
-
-          if (table.dataset.url) {
-            let url = table.dataset.url;
-            if (table.dataset.pk) {
-              url += id;
+        } else if (e.target.tagName === 'TD') {
+          let editing = document.getElementsByClassName("td_editing");
+          if (editing.length > 0) {
+            // click on a cell when editing another causes put
+            let el = editing[0].parentNode
+            window.htmx.ajax('PUT', "", {source: "#" + el.id, target: "#" + el.id, values: window.htmx.closest(el, 'tr')})
+          } else {
+            let row = e.target.parentNode;
+            let pk = row.id.slice(3);
+            let table = row.parentNode.parentNode;
+            let col = 0;
+            let previous = e.target.previousElementSibling;
+            while (previous) {
+              previous = previous.previousElementSibling;
+              col += 1;
             }
-            if (table.dataset.method === "get") {
-              window.document.location = url;
-            } else if (table.dataset.method === "hxget") {
-              htmx.ajax('GET', url, {source: '#' + row.id, target: table.dataset.target});
+            let tdId = ("td" + "_" + pk + "_" + col + "_" + window.outerWidth);
+            if (e.target.classList.contains("td_edit")) {
+              // fetch template for editable cell
+              e.target.setAttribute("id", tdId);
+              window.htmx.ajax('GET', "", {source: '#' + tdId, target: '#' + tdId});
+            } else if (table.dataset.url) {
+              let url = table.dataset.url;
+              if (table.dataset.pk) {
+                url += pk;
+              }
+              //url += "?return=" +encodeURIComponent(window.location.pathname + window.location.search)
+              if (table.dataset.method === "get") {
+                window.document.location.assign(url)
+              } else if (table.dataset.method === "hxget") {
+                window.htmx.ajax('GET', url, {source: '#' + row.id, target: table.dataset.target});
+              }
+            } else {
+              window.htmx.ajax('GET', "", {
+                source: '#' + row.id,
+                target: '#' + row.id,
+                values: {col: col, width: window.outerWidth}
+              });
             }
-          } else if (e.target.classList.contains("td_edit")) {
-            e.target.setAttribute("id", tdId);
-            htmx.ajax('GET', "", {source: '#' + tdId, target: '#' + tdId});
           }
         }
       }
@@ -207,7 +172,7 @@ var tablesPro = (function () {
 
 // Count the number of checked rows and nake sure they are highlighted
     function countChecked() {
-      if (selAll.checked) {
+      if (selAll && selAll.checked) {
         return
       }
       let checked = Array.from(document.querySelectorAll(".select-checkbox:checked"));
@@ -226,41 +191,8 @@ var tablesPro = (function () {
         actionMenu.enabled = (count > 0 || selAll.checked);
       }
     }
-// function windowSize():
-// htmx
-
-// function setMobileTable(selector) {
-//     // if (window.innerWidth > 600) return false;
-//     const tableEl = document.querySelector(selector);
-//     const thEls = tableEl.querySelectorAll('thead th');
-//     const tdLabels = Array.from(thEls).map(el => el.innerText);
-//     tableEl.querySelectorAll('tbody tr').forEach(tr => {
-//         Array.from(tr.children).forEach(
-//             (td, ndx) => td.setAttribute('label', tdLabels[ndx])
-//         );
-//     });
-// }
-
     return tb
   }
-
 )
 ();
-// document.addEventListener("DOMContentLoaded", (event) =>{
-//   alert("DOM loaded")
-// })
-// window.addEventListener("hashchange", hashchange)
 window.addEventListener("load", tablesPro.init)
-tablesPro.show()
-// window.addEventListener("popstate", (event) => {
-//   alert(
-//     `location: ${document.location}, state: ${JSON.stringify(event.state)}`
-//   );
-// });
-//
-// function test() {
-//   alert("onload")
-// }
-// function hashchange(){
-//   alert("hashchange")
-// }
