@@ -14,7 +14,7 @@ from django_htmx.http import (
 from django_tables2 import SingleTableMixin
 from django_tables2.export.export import TableExport
 
-from tables_pro.utils import (
+from django_tableaux.utils import (
     breakpoints,
     define_columns,
     set_column_states,
@@ -32,7 +32,7 @@ class ConfigurationError(Exception):
     pass
 
 
-class TablesProView(SingleTableMixin, FilterView):
+class DjangoTableauxView(SingleTableMixin, FilterView):
     class FilterStyle(IntEnum):
         NONE = 0
         TOOLBAR = 1
@@ -40,13 +40,13 @@ class TablesProView(SingleTableMixin, FilterView):
         HEADER = 3
 
     title = ""
-    template_name = "tables_pro/tables_pro.html"
+    template_name = "django_tableaux/django_tableaux.html"
     templates = {
-        "filter": "tables_pro/modal_filter.html",
-        "table_data": "tables_pro/render_table_data.html",
-        "rows": "tables_pro/render_rows.html",
-        "cell_form": "tables_pro/cell_form.html",
-        "cell_error": "tables_pro/cell_error.html",
+        "filter": "django_tableaux/modal_filter.html",
+        "table_data": "django_tableaux/render_table_data.html",
+        "rows": "django_tableaux/render_rows.html",
+        "cell_form": "django_tableaux/cell_form.html",
+        "cell_error": "django_tableaux/cell_error.html",
     }
 
     model = None
@@ -99,7 +99,7 @@ class TablesProView(SingleTableMixin, FilterView):
             if "_width" in request.GET:
                 self.width = int(request.GET["_width"])
             else:
-                return render(request, "tables_pro/width_request.html")
+                return render(request, "django_tableaux/width_request.html")
 
         if request.htmx:
             return self.get_htmx(request, *args, **kwargs)
@@ -233,9 +233,13 @@ class TablesProView(SingleTableMixin, FilterView):
             ),
             breakpoints=breakpoints(self.table),
             width=self.width,
+            filters=[]
         )
         if "_width" in self.request.GET:
             context["breakpoints"] = None
+        for key, value in self.request.GET.items():
+            if key not in ["page", "sort", "_width"] and value:
+                context['filters'].append(key)
         return context
 
     def put(self, request, *args, **kwargs):
@@ -283,6 +287,15 @@ class TablesProView(SingleTableMixin, FilterView):
 
     def get_export_format(self):
         return self.export_format
+
+    def get_filterset_kwargs(self, filterset_class):
+        kwargs = super().get_filterset_kwargs(filterset_class)
+        if kwargs["data"]:
+            qd = kwargs["data"].copy()
+            if "filter_save" in qd.keys():
+                qd.pop("filter_save")
+                kwargs["data"] = qd
+        return kwargs
 
     def filtered_query_set(self, request, next=False):
         """Recreate the queryset used in GET for use in POST"""

@@ -1,9 +1,9 @@
 import pytest
 from django_tables2 import tables
-from tables_pro.columns import SelectionColumn
-from tables_pro.buttons import Button
+from django_tableaux.columns import SelectionColumn
+from django_tableaux.buttons import Button
 from django.db.models import *
-from tables_pro.utils import define_columns, get_breakpoints
+from django_tableaux.utils import define_columns, get_breakpoints
 
 
 class TestModel(Model):

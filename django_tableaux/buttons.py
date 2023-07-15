@@ -4,7 +4,7 @@ from django.utils.text import slugify
 
 
 class Button:
-    template_name = "tables_pro/button.html"
+    template_name = "django_tableaux/button.html"
 
     def __init__(self, content, name="", typ="button", css="btn btn-primary", **kwargs):
         self.context = {
@@ -18,5 +18,7 @@ class Button:
         self.context.update(kwargs)
 
     def render(self):
-        html = mark_safe(render_to_string(template_name=self.template_name, context=self.context))
+        html = mark_safe(
+            render_to_string(template_name=self.template_name, context=self.context)
+        )
         return html

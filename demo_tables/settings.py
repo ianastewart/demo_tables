@@ -42,8 +42,8 @@ INSTALLED_APPS = [
     "django_tables2",
     "django_filters",
     "django_htmx",
+    "django_tableaux",
     "movies",
-    "tables_pro",
 ]
 
 MIDDLEWARE = [

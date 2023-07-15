@@ -1,5 +1,5 @@
 import django_tables2 as tables
-from tables_pro.columns import CurrencyColumn, RightAlignedColumn, SelectionColumn
+from django_tableaux.columns import CurrencyColumn, RightAlignedColumn, SelectionColumn
 from movies.models import Movie
 
 
@@ -16,7 +16,7 @@ class MovieTable(tables.Table):
         )
         attrs = {
             "class": "table table-sm ",
-         #   "thead": {"class": "bg-light border-top border-bottom"},
+            #   "thead": {"class": "bg-light border-top border-bottom"},
         }
 
     budget = CurrencyColumn(prefix="$")

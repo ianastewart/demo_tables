@@ -97,7 +97,6 @@ let tablesPro = (function () {
           if (selAllPage) {
             selAllPage.checked = false
           }
-          // selAll.parentElement.style.display = 'none';
           let chkBox = e.target
           highlightRow(chkBox)
           if (!lastChecked) {
@@ -108,7 +107,6 @@ let tablesPro = (function () {
             let end = chkBoxes.indexOf(lastChecked)
             chkBoxes.slice(Math.min(start, end), Math.max(start, end) + 1).forEach(function (box) {
               box.checked = chkBox.checked;
-              // highlightRow(box)
             });
             lastChecked = chkBox;
           } else {

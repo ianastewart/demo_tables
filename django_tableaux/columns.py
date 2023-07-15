@@ -1,7 +1,7 @@
 import itertools
 import django_tables2 as tables
 from django.contrib.humanize.templatetags.humanize import intcomma
-from tables_pro.utils import load_columns, save_columns
+from django_tableaux.utils import load_columns, save_columns
 
 
 class RightAlignedColumn(tables.Column):
@@ -55,13 +55,13 @@ class CurrencyColumn(RightAlignedColumn):
 
 class CheckBoxColumn(tables.TemplateColumn):
     def __init__(self, **kwargs):
-        kwargs["template_name"] = "tables_pro/custom_checkbox.html"
+        kwargs["template_name"] = "django_tableaux/custom_checkbox.html"
         super().__init__(**kwargs)
 
 
 class SelectionColumn(tables.TemplateColumn):
     def __init__(self, **kwargs):
-        kwargs["template_name"] = "tables_pro/select_checkbox.html"
+        kwargs["template_name"] = "django_tableaux/select_checkbox.html"
         kwargs["verbose_name"] = ""
         kwargs["accessor"] = "id"
         kwargs["orderable"] = False

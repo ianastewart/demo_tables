@@ -9,7 +9,7 @@ from django_htmx.http import (
 from django.http import HttpResponse
 from .models import Movie
 from .forms import MovieForm
-from tables_pro.views import TablesProView, SelectedMixin
+from django_tableaux.views import DjangoTableauxView, SelectedMixin
 from .tables import MovieTable, MovieTableSelection, MovieTableResponsive, MovieTable4
 from .filters import MovieFilter
 from django.utils.safestring import mark_safe
@@ -25,14 +25,14 @@ class MoviesListView(ListView):
         return context
 
 
-class BasicView(TablesProView):
+class BasicView(DjangoTableauxView):
     title = "Basic view"
     table_class = MovieTable
     template_name = "movies/table.html"
     model = Movie
 
 
-class RowColSettingsView(TablesProView):
+class RowColSettingsView(DjangoTableauxView):
     title = "Row and column settings"
     table_class = MovieTable
     template_name = "movies/table.html"
@@ -48,7 +48,7 @@ class RowColSettingsView(TablesProView):
         return context
 
 
-class SelectActionsView(TablesProView):
+class SelectActionsView(DjangoTableauxView):
     title = "Selection and actions"
     table_class = MovieTableSelection
     template_name = "movies/table.html"
@@ -69,7 +69,7 @@ class SelectActionsView(TablesProView):
                 "message": f"Action on {self.selected_objects.count()} rows",
                 "alert_class": "alert-success",
             }
-            response = render(request, "tables_pro/_alert.html", context)
+            response = render(request, "django_tableaux/_alert.html", context)
             return retarget(response, "#messages")
 
         elif action == "action_modal":
@@ -93,7 +93,7 @@ class ActionPageView(SelectedMixin, TemplateView):
         return context
 
 
-class InfiniteScollView(TablesProView):
+class InfiniteScollView(DjangoTableauxView):
     title = "Infinite scroll"
     table_class = MovieTable
     template_name = "movies/table.html"
@@ -102,7 +102,7 @@ class InfiniteScollView(TablesProView):
     sticky_header = True
 
 
-class InfiniteLoadView(TablesProView):
+class InfiniteLoadView(DjangoTableauxView):
     title = "Infinite load more"
     table_class = MovieTable
     template_name = "movies/table.html"
@@ -111,11 +111,11 @@ class InfiniteLoadView(TablesProView):
     sticky_header = True
 
 
-class MoviesFilterToolbarView(TablesProView):
+class MoviesFilterToolbarView(DjangoTableauxView):
     title = "Filter toolbar"
     table_class = MovieTable
     filterset_class = MovieFilter
-    filter_style = TablesProView.FilterStyle.TOOLBAR
+    filter_style = DjangoTableauxView.FilterStyle.TOOLBAR
     template_name = "movies/table.html"
     column_settings = True
     row_settings = True
@@ -127,7 +127,7 @@ class MoviesFilterModalView(SelectActionsView):
     title = "Filter modal"
     table_class = MovieTableResponsive
     filterset_class = MovieFilter
-    filter_style = TablesProView.FilterStyle.MODAL
+    filter_style = DjangoTableauxView.FilterStyle.MODAL
     template_name = "movies/table.html"
     column_settings = True
     row_settings = True
@@ -139,16 +139,16 @@ class MoviesFilterHeaderView(SelectActionsView):
     title = "Filter in header"
     table_class = MovieTableResponsive
     filterset_class = MovieFilter
-    filter_style = TablesProView.FilterStyle.HEADER
+    filter_style = DjangoTableauxView.FilterStyle.HEADER
     template_name = "movies/table.html"
     column_settings = True
     row_settings = True
-    #responsive = True
+    # responsive = True
     sticky_header = True
     infinite_scroll = True
 
 
-class MoviesEditableView(TablesProView):
+class MoviesEditableView(DjangoTableauxView):
     title = "Editable columns"
     model = Movie
     form_class = MovieForm
@@ -158,7 +158,7 @@ class MoviesEditableView(TablesProView):
     row_settings = True
 
 
-class MoviesRowClickView(TablesProView):
+class MoviesRowClickView(DjangoTableauxView):
     title = "Click row shows detail page"
     template_name = "movies/table.html"
     table_class = MovieTableResponsive
@@ -166,7 +166,7 @@ class MoviesRowClickView(TablesProView):
     click_url_name = "movie_detail"
 
 
-class MoviesRowClickModalView(TablesProView):
+class MoviesRowClickModalView(DjangoTableauxView):
     title = "Click row shows detail modal "
     template_name = "movies/table.html"
     table_class = MovieTableResponsive

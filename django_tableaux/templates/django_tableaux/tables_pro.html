@@ -23,18 +23,18 @@
   <div class="container p-0" style="height: calc(100% - 60px);">
     {% if view.filterset_class and view.filter_row %}
       <div class="bg-light ">
-        {% include "tables_pro/filter_toolbar.html" %}
+        {% include "django_tableaux/filter_toolbar.html" %}
       </div>
     {% endif %}
     <form hx-post="">
       {% csrf_token %}
       {% if actions or buttons or columns or view.filter_class and view.filter_modal %}
         <div class="bg-light">
-          {% include "tables_pro/action_toolbar.html" %}
+          {% include "django_tableaux/action_toolbar.html" %}
         </div>
       {% endif %}
       <div id="table_data" class="bg-white">
-        {% include "tables_pro/render_table_data.html" %}
+        {% include "django_tableaux/render_table_data.html" %}
       </div>
     </form>
   </div>
