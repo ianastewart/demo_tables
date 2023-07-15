@@ -13,3 +13,4 @@ soupsieve==2.4.1
 sqlparse==0.4.4
 tablib==3.4.0
 tzdata==2023.3
+django_tableaux==0.1
