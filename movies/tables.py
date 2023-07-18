@@ -98,3 +98,8 @@ class MovieTable4(tables.Table):
             "vote_count",
         ]
         attrs = {"class": "table table-sm table-hover hover-link"}
+
+    budget = CurrencyColumn(prefix="$")
+    revenue = CurrencyColumn(attrs={"td": {"class": "td_edit"}})
+    runtime = RightAlignedColumn()
+    vote_count = tables.Column(attrs={"td": {"class": "ian"}})
