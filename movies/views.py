@@ -28,7 +28,7 @@ class MoviesListView(ListView):
 class BasicView(DjangoTableauxView):
     title = "Basic view"
     table_class = MovieTable
-    template_name = "django_tableaux/tableaux.html"
+    template_name = "movies/table.html"
     model = Movie
 
 
