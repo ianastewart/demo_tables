@@ -16,6 +16,7 @@ urlpatterns = [
     path("editable/", MoviesEditableView.as_view(), name="editable"),
     path("row_click/", MoviesRowClickView.as_view(), name="row_click"),
     path("row_click_modal/", MoviesRowClickModalView.as_view(), name="row_click_modal"),
+    path("row_click_custom/", MoviesRowClickCustomView.as_view(), name="row_click_custom"),
     path("action/", ActionPageView.as_view(), name="action_page"),
     path("detail/<int:pk>/", MovieDetailView.as_view(), name="movie_detail"),
     path("modal/<int:pk>/", MovieModalView.as_view(), name="movie_modal"),

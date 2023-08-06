@@ -102,4 +102,4 @@ class MovieTable4(tables.Table):
     budget = CurrencyColumn(prefix="$")
     revenue = CurrencyColumn(attrs={"td": {"class": "td_edit"}})
     runtime = RightAlignedColumn()
-    vote_count = tables.Column(attrs={"td": {"class": "ian"}})
+    vote_count = tables.Column()

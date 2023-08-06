@@ -6,5 +6,6 @@ class MovieForm(forms.ModelForm):
     class Meta:
         model = Movie
         fields = [
+            "revenue",
             "vote_count",
         ]

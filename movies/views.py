@@ -163,6 +163,7 @@ class MoviesRowClickView(DjangoTableauxView):
     template_name = "movies/table.html"
     table_class = MovieTableResponsive
     model = Movie
+    click_action = DjangoTableauxView.ClickAction.GET
     click_url_name = "movie_detail"
 
 
@@ -171,8 +172,19 @@ class MoviesRowClickModalView(DjangoTableauxView):
     template_name = "movies/table.html"
     table_class = MovieTableResponsive
     model = Movie
+    click_action = DjangoTableauxView.ClickAction.HX_GET
     click_url_name = "movie_modal"
-    click_method = "hxget"
+
+
+class MoviesRowClickCustomView(DjangoTableauxView):
+    title = "Custom click cell"
+    template_name = "movies/table.html"
+    table_class = MovieTableResponsive
+    model = Movie
+    click_action = DjangoTableauxView.ClickAction.CUSTOM
+
+    def cell_clicked(self, pk, column_name, target):
+        return HttpResponse(mark_safe('<span style="color: red;">XXX</span>'))
 
 
 class MovieDetailView(DetailView):
