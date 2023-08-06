@@ -9,7 +9,7 @@ from django_htmx.http import (
 from django.http import HttpResponse
 from .models import Movie
 from .forms import MovieForm
-from django_tableaux.views import DjangoTableauxView, SelectedMixin
+from django_tableaux.views import TableauxView, SelectedMixin
 from .tables import MovieTable, MovieTableSelection, MovieTableResponsive, MovieTable4
 from .filters import MovieFilter
 from django.utils.safestring import mark_safe
@@ -25,14 +25,14 @@ class MoviesListView(ListView):
         return context
 
 
-class BasicView(DjangoTableauxView):
+class BasicView(TableauxView):
     title = "Basic view"
     table_class = MovieTable
     template_name = "movies/table.html"
     model = Movie
 
 
-class RowColSettingsView(DjangoTableauxView):
+class RowColSettingsView(TableauxView):
     title = "Row and column settings"
     table_class = MovieTable
     template_name = "movies/table.html"
@@ -48,7 +48,7 @@ class RowColSettingsView(DjangoTableauxView):
         return context
 
 
-class SelectActionsView(DjangoTableauxView):
+class SelectActionsView(TableauxView):
     title = "Selection and actions"
     table_class = MovieTableSelection
     template_name = "movies/table.html"
@@ -93,7 +93,7 @@ class ActionPageView(SelectedMixin, TemplateView):
         return context
 
 
-class InfiniteScollView(DjangoTableauxView):
+class InfiniteScollView(TableauxView):
     title = "Infinite scroll"
     table_class = MovieTable
     template_name = "movies/table.html"
@@ -102,7 +102,7 @@ class InfiniteScollView(DjangoTableauxView):
     sticky_header = True
 
 
-class InfiniteLoadView(DjangoTableauxView):
+class InfiniteLoadView(TableauxView):
     title = "Infinite load more"
     table_class = MovieTable
     template_name = "movies/table.html"
@@ -111,11 +111,11 @@ class InfiniteLoadView(DjangoTableauxView):
     sticky_header = True
 
 
-class MoviesFilterToolbarView(DjangoTableauxView):
+class MoviesFilterToolbarView(TableauxView):
     title = "Filter toolbar"
     table_class = MovieTable
     filterset_class = MovieFilter
-    filter_style = DjangoTableauxView.FilterStyle.TOOLBAR
+    filter_style = TableauxView.FilterStyle.TOOLBAR
     template_name = "movies/table.html"
     column_settings = True
     row_settings = True
@@ -127,7 +127,7 @@ class MoviesFilterModalView(SelectActionsView):
     title = "Filter modal"
     table_class = MovieTableResponsive
     filterset_class = MovieFilter
-    filter_style = DjangoTableauxView.FilterStyle.MODAL
+    filter_style = TableauxView.FilterStyle.MODAL
     template_name = "movies/table.html"
     column_settings = True
     row_settings = True
@@ -139,7 +139,7 @@ class MoviesFilterHeaderView(SelectActionsView):
     title = "Filter in header"
     table_class = MovieTableResponsive
     filterset_class = MovieFilter
-    filter_style = DjangoTableauxView.FilterStyle.HEADER
+    filter_style = TableauxView.FilterStyle.HEADER
     template_name = "movies/table.html"
     column_settings = True
     row_settings = True
@@ -148,7 +148,7 @@ class MoviesFilterHeaderView(SelectActionsView):
     infinite_scroll = True
 
 
-class MoviesEditableView(DjangoTableauxView):
+class MoviesEditableView(TableauxView):
     title = "Editable columns"
     model = Movie
     form_class = MovieForm
@@ -158,30 +158,30 @@ class MoviesEditableView(DjangoTableauxView):
     row_settings = True
 
 
-class MoviesRowClickView(DjangoTableauxView):
+class MoviesRowClickView(TableauxView):
     title = "Click row shows detail page"
     template_name = "movies/table.html"
     table_class = MovieTableResponsive
     model = Movie
-    click_action = DjangoTableauxView.ClickAction.GET
+    click_action = TableauxView.ClickAction.GET
     click_url_name = "movie_detail"
 
 
-class MoviesRowClickModalView(DjangoTableauxView):
+class MoviesRowClickModalView(TableauxView):
     title = "Click row shows detail modal "
     template_name = "movies/table.html"
     table_class = MovieTableResponsive
     model = Movie
-    click_action = DjangoTableauxView.ClickAction.HX_GET
+    click_action = TableauxView.ClickAction.HX_GET
     click_url_name = "movie_modal"
 
 
-class MoviesRowClickCustomView(DjangoTableauxView):
+class MoviesRowClickCustomView(TableauxView):
     title = "Custom click cell"
     template_name = "movies/table.html"
     table_class = MovieTableResponsive
     model = Movie
-    click_action = DjangoTableauxView.ClickAction.CUSTOM
+    click_action = TableauxView.ClickAction.CUSTOM
 
     def cell_clicked(self, pk, column_name, target):
         return HttpResponse(mark_safe('<span style="color: red;">XXX</span>'))
