@@ -16,12 +16,14 @@ class MovieTable(tables.Table):
         )
         attrs = {
             "class": "table table-sm ",
-            #   "thead": {"class": "bg-light border-top border-bottom"},
+            "thead": {"class": "bg-dark border-top border-bottom sticky"},
+            "th": {"class": "bg-danger border-top border-bottom sticky"},
         }
 
-    budget = CurrencyColumn(prefix="$")
+    budget = CurrencyColumn(prefix="$", attrs={"class": "bg-danger"})
     revenue = CurrencyColumn(prefix="$")
-    runtime = RightAlignedColumn()
+    # runtime = RightAlignedColumn()
+    runtime = tables.Column()
 
 
 class MovieTableSelection(tables.Table):

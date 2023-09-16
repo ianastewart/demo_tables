@@ -8,7 +8,8 @@ django-bootstrap5==23.3
 django-filter==23.2
 django-htmx==1.16.0
 django-tables2==2.6.0
-django-tableaux==0.5
+django-tableaux==0.6.3
+# -e C:/Users/is/PycharmProjects/django_tableaux
 et-xmlfile==1.1.0
 exceptiongroup==1.1.1
 iniconfig==2.0.0

@@ -1,18 +1,15 @@
 from django.shortcuts import render, reverse
-from django.contrib import messages
 from django.views.generic import ListView, TemplateView, DetailView
 from django_htmx.http import (
     HttpResponseClientRedirect,
-    HttpResponseClientRefresh,
     retarget,
 )
-from django.http import HttpResponse
-from .models import Movie
-from .forms import MovieForm
 from django_tableaux.views import TableauxView, SelectedMixin
-from .tables import MovieTable, MovieTableSelection, MovieTableResponsive, MovieTable4
+
 from .filters import MovieFilter
-from django.utils.safestring import mark_safe
+from .forms import MovieForm
+from .models import Movie
+from .tables import MovieTable, MovieTableSelection, MovieTableResponsive, MovieTable4
 
 
 class MoviesListView(ListView):
@@ -54,7 +51,7 @@ class SelectActionsView(TableauxView):
     template_name = "movies/table.html"
     model = Movie
 
-    def get_actions(self):
+    def get_bulk_actions(self):
         return (
             ("action_message", "Action with message"),
             ("action_modal", "Action in a modal"),
@@ -184,7 +181,15 @@ class MoviesRowClickCustomView(TableauxView):
     click_action = TableauxView.ClickAction.CUSTOM
 
     def cell_clicked(self, pk, column_name, target):
-        return HttpResponse(mark_safe('<span style="color: red;">XXX</span>'))
+        movie = Movie.objects.get(pk=pk)
+        context = {
+            "message": f"'{movie.title}', primary key: {pk}, column: {column_name} was clicked.",
+            "alert_class": "alert-success",
+        }
+        response = render(
+            self.request, "django_tableaux/bootstrap4/alert.html", context
+        )
+        return retarget(response, "#messages")
 
 
 class MovieDetailView(DetailView):
