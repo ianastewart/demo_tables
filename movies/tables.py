@@ -14,11 +14,11 @@ class MovieTable(tables.Table):
             "revenue",
             "runtime",
         )
-        attrs = {
-            "class": "table table-sm ",
-            "thead": {"class": "bg-dark border-top border-bottom sticky"},
-            "th": {"class": "bg-danger border-top border-bottom sticky"},
-        }
+        # attrs = {
+        #     "class": "table table-sm fixed-header",
+        #     "thead": {"class": "border-top border-bottom sticky "},
+        #     "th": {"class": "border-top border-bottom sticky"},
+        # }
 
     budget = CurrencyColumn(prefix="$", attrs={"class": "bg-danger"})
     revenue = CurrencyColumn(prefix="$")
@@ -60,7 +60,7 @@ class MovieTableResponsive(tables.Table):
             "revenue",
             "runtime",
         )
-        sequence = ("selection",)
+        # sequence = ("selection",)
         attrs = {"class": "table table-sm table-hover hover-link"}
 
         columns_lg = {

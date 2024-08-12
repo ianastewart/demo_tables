@@ -66,7 +66,7 @@ class SelectActionsView(TableauxView):
                 "message": f"Action on {self.selected_objects.count()} rows",
                 "alert_class": "alert-success",
             }
-            response = render(request, "django_tableaux/_alert.html", context)
+            response = render(request, self.templates["alert"], context)
             return retarget(response, "#messages")
 
         elif action == "action_modal":
