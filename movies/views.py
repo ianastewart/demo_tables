@@ -24,6 +24,7 @@ class MoviesListView(ListView):
 
 class BasicView(TableauxView):
     title = "Basic view"
+    caption = "This table has a caption"
     table_class = MovieTable
     template_name = "movies/table.html"
     model = Movie
@@ -141,8 +142,6 @@ class MoviesFilterHeaderView(SelectActionsView):
     column_settings = True
     row_settings = True
     # responsive = True
-    sticky_header = True
-    infinite_scroll = True
 
 
 class MoviesEditableView(TableauxView):
@@ -158,7 +157,7 @@ class MoviesEditableView(TableauxView):
 class MoviesRowClickView(TableauxView):
     title = "Click row shows detail page"
     template_name = "movies/table.html"
-    table_class = MovieTableResponsive
+    table_class = MovieTable
     model = Movie
     click_action = TableauxView.ClickAction.GET
     click_url_name = "movie_detail"

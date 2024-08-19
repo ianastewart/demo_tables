@@ -1,16 +1,19 @@
 {% extends "movies/base.html" %}
 {% load bootstrap4 static %}
 {% block head %}
-  {% include "django_tableaux/block_head.html" %}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
+<link rel="stylesheet" href="{% static "django_tableaux/css/django_tableaux.css" %}">
+{% endblock %}
+{% block navbar %}
+{% include "movies/navbar.html" %}
 {% endblock %}
 {% block content %}
   <div class="container">
     <h3 class="text-center">{{ view.title }}</h3>
-    <div id="messages">
-    {% bootstrap_messages %}
-    </div>
+{#    <div id="messages">#}
+{#    {% bootstrap_messages %}#}
+{#    </div>#}
     {% include "django_tableaux/block_content.html" %}
   </div>
-  <script src="{% static "htmx1.9.1.min.js" %}"></script>
-  <script src="{% static "django_tableaux/js/django_tableaux.js" %}"></script>
 {% endblock %}

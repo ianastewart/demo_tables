@@ -14,11 +14,11 @@ class MovieTable(tables.Table):
             "revenue",
             "runtime",
         )
-        # attrs = {
-        #     "class": "table table-sm fixed-header",
-        #     "thead": {"class": "border-top border-bottom sticky "},
-        #     "th": {"class": "border-top border-bottom sticky"},
-        # }
+        attrs = {
+            "class": "pure-table",
+            # "thead": {"class": "border-top border-bottom sticky "},
+            # "th": {"class": "border-top border-bottom sticky"},
+        }
 
     budget = CurrencyColumn(prefix="$", attrs={"class": "bg-danger"})
     revenue = CurrencyColumn(prefix="$")
@@ -61,7 +61,7 @@ class MovieTableResponsive(tables.Table):
             "runtime",
         )
         # sequence = ("selection",)
-        attrs = {"class": "table table-sm table-hover hover-link"}
+        # attrs = {"class": "table table-sm table-hover hover-link"}
 
         columns_lg = {
             "fixed": ["selection", "title", "budget", "popularity"],
@@ -72,11 +72,11 @@ class MovieTableResponsive(tables.Table):
         }
         columns_sm = {
             "fixed": ["selection", "title"],
-            "default": ["selection", "title"],
+            "default": ["selection", "title", "budget", "popularity"],
             "mobile": True,
             "attrs": {"th": "strong bg-dark text-white", "tr": "bg-light"},
         }
-        responsive = {300: columns_sm, 600: columns_md, 1000: columns_lg}
+        responsive = {300: columns_sm, 600: columns_md, 900: columns_lg}
 
     selection = SelectionColumn()
     budget = CurrencyColumn(prefix="$")
