@@ -91,13 +91,18 @@ class ActionPageView(SelectedMixin, TemplateView):
         return context
 
 
-class InfiniteScollView(TableauxView):
+class InfiniteScrollView(TableauxView):
     title = "Infinite scroll"
-    table_class = MovieTable
+    table_class = MovieTableSelection
     template_name = "movies/table.html"
     model = Movie
+    column_settings = True
+    row_settings = True
     infinite_scroll = True
     sticky_header = True
+
+    def get_bulk_actions(self):
+        return (("action_message", "Action with message"),)
 
 
 class InfiniteLoadView(TableauxView):

@@ -2,7 +2,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
 {% block head %}
 {% endblock %}
 </head>
@@ -11,9 +13,6 @@
 {% endblock %}
 {% block content %}
 {% endblock %}
-{% django_htmx_script %}
-  <script src="{% static "htmx1.9.1.min.js" %}"></script>
-  <script src="{% static "django_tableaux/js/django_tableaux.js" %}"></script>
 {% block scripts %}
 {% endblock %}
 </body>

@@ -1,12 +1,10 @@
 {% extends "movies/base.html" %}
 {% load bootstrap4 static %}
 {% block head %}
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
-<link rel="stylesheet" href="{% static "django_tableaux/css/django_tableaux.css" %}">
+{% include templates.block_head %}
 {% endblock %}
 {% block navbar %}
-{% include "movies/navbar.html" %}
+{% include "movies/navbar_bootstrap.html" %}
 {% endblock %}
 {% block content %}
   <div class="container">
@@ -14,6 +12,9 @@
 {#    <div id="messages">#}
 {#    {% bootstrap_messages %}#}
 {#    </div>#}
-    {% include "django_tableaux/block_content.html" %}
+    {% include templates.block_content %}
   </div>
+{% endblock %}
+{% block scripts %}
+{% include templates.block_scripts %}
 {% endblock %}
