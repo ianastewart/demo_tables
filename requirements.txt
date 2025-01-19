@@ -1,5 +1,4 @@
 asgiref==3.6.0
-backports.zoneinfo==0.2.1
 beautifulsoup4==4.12.2
 colorama==0.4.6
 Django==4.2.3
@@ -9,7 +8,7 @@ django-filter==23.2
 django-htmx==1.16.0
 django-tables2==2.6.0
 # django-tableaux==0.6.4
--e C:/Users/is/PycharmProjects/django_tableaux
+-e /home/ian/PycharmProjects/django_tableaux
 et-xmlfile==1.1.0
 exceptiongroup==1.1.1
 iniconfig==2.0.0

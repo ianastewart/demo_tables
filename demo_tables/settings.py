@@ -84,7 +84,7 @@ WSGI_APPLICATION = "demo_tables.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": BASE_DIR / "sqlite3",
     }
 }
 
@@ -133,3 +133,4 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Django_bootstrap4 settings
 BOOTSTRAP4 = {"error_css_class": "", "success_css_class": ""}
 # DJANGO_TABLEAUX_LIBRARY = "templates/my_library"
+DJANGO_TABLEAUX_LIBRARY = "bootstrap4"
