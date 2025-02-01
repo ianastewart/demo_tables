@@ -15,7 +15,7 @@ class MovieTable(tables.Table):
             "runtime",
         )
         attrs = {
-            "class": "table-sm table-hover",
+            # "class": "table table-sm table-hover",
             # "thead": {"class": "border-top border-bottom sticky "},
             # "th": {"class": "border-top border-bottom sticky"},
         }
