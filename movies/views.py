@@ -30,6 +30,11 @@ class BasicView(TableauxView):
     model = Movie
 
 
+class BasicViewNew(TemplateView):
+    title = "Basic view new"
+    template_name = "movies/table_new.html"
+
+
 class RowColSettingsView(TableauxView):
     title = "Row and column settings"
     table_class = MovieTable
@@ -114,9 +119,22 @@ class InfiniteLoadView(TableauxView):
     sticky_header = True
 
 
-class MoviesFilterToolbarView(TableauxView):
+class ResponsiveView(SelectActionsView):
+    title = "Responsive"
+    table_class = MovieTableResponsive
+    template_name = "movies/table.html"
+    model = Movie
+
+
+class ResponsiveComponentView(TableauxView):
+    table_class = MovieTableResponsive
+    template_name = "movies/table_new.html"
+    model = Movie
+
+
+class MoviesFilterToolbarView(SelectActionsView):
     title = "Filter toolbar"
-    table_class = MovieTable
+    table_class = MovieTableResponsive
     filterset_class = MovieFilter
     filter_style = TableauxView.FilterStyle.TOOLBAR
     template_name = "movies/table.html"

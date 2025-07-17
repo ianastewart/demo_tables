@@ -15,9 +15,9 @@ class MovieTable(tables.Table):
             "runtime",
         )
         attrs = {
-            # "class": "table table-sm table-hover",
-            # "thead": {"class": "border-top border-bottom sticky "},
-            # "th": {"class": "border-top border-bottom sticky"},
+            "class": "table table-sm table-hover",
+            "thead": {"class": "border-top border-bottom sticky "},
+            "th": {"class": "border-top border-bottom sticky"},
         }
 
     budget = CurrencyColumn(prefix="$", attrs={"class": "bg-danger"})
@@ -61,14 +61,23 @@ class MovieTableResponsive(tables.Table):
             "runtime",
         )
         # sequence = ("selection",)
-        # attrs = {"class": "table table-sm table-hover hover-link"}
+        attrs = {"class": "table table-sm table-hover hover-link"}
 
         columns_lg = {
-            "fixed": ["selection", "title", "budget", "popularity"],
+            "fixed": ["selection", "title", "budget", "popularity", "release_date"],
+            "default": [
+                "selection",
+                "title",
+                "budget",
+                "popularity",
+                "release_date",
+                "revenue",
+                "runtime",
+            ]
         }
         columns_md = {
-            "fixed": ["selection", "title", "budget"],
-            "default": ["selection", "title", "budget"],
+            "fixed": ["selection", "title", "budget", "popularity"],
+            "default": ["selection", "title", "budget", "popularity"],
         }
         columns_sm = {
             "fixed": ["selection", "title"],
@@ -76,7 +85,11 @@ class MovieTableResponsive(tables.Table):
             "mobile": True,
             "attrs": {"th": "strong bg-dark text-white", "tr": "bg-light"},
         }
-        responsive = {300: columns_sm, 600: columns_md, 900: columns_lg}
+        responsive = {"sm": columns_sm, "md": columns_md, "lg": columns_lg}
+
+
+
+
 
     selection = SelectionColumn()
     budget = CurrencyColumn(prefix="$")
