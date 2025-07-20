@@ -49,6 +49,8 @@ class MovieTableSelection(tables.Table):
     runtime = RightAlignedColumn()
 
 
+
+
 class MovieTableResponsive(tables.Table):
     class Meta:
         model = Movie
@@ -86,10 +88,6 @@ class MovieTableResponsive(tables.Table):
             "attrs": {"th": "strong bg-dark text-white", "tr": "bg-light"},
         }
         responsive = {"sm": columns_sm, "md": columns_md, "lg": columns_lg}
-
-
-
-
 
     selection = SelectionColumn()
     budget = CurrencyColumn(prefix="$")

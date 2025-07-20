@@ -30,10 +30,14 @@ class BasicView(TableauxView):
     model = Movie
 
 
-class BasicViewNew(TemplateView):
+class BasicViewNew(TableauxView):
     title = "Basic view new"
+    table_class = MovieTableResponsive
     template_name = "movies/table_new.html"
+    model = Movie
 
+    def get_bulk_actions(self):
+        return (("action_message", "Action with message"),)
 
 class RowColSettingsView(TableauxView):
     title = "Row and column settings"
