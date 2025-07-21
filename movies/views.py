@@ -193,7 +193,7 @@ class MoviesRowClickView(TableauxView):
 class MoviesRowClickModalView(TableauxView):
     title = "Click row shows detail modal "
     template_name = "movies/table.html"
-    table_class = MovieTableResponsive
+    table_class = MovieTable
     model = Movie
     click_action = TableauxView.ClickAction.HX_GET
     click_url_name = "movie_modal"
