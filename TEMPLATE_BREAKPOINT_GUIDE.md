@@ -260,3 +260,4 @@ Add to your VS Code settings:
     "django.templates": ["templates", "movies/templates"]
 }
 ```
+
