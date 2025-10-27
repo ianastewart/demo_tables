@@ -1,0 +1,200 @@
+{% comment %}
+Template Breakpoint Demo Page
+This template demonstrates various breakpoint methods
+{% endcomment %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template Breakpoint Demo</title>
+    <style>
+        .breakpoint-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 2px solid #dc3545;
+            background-color: #f8d7da;
+            border-radius: 5px;
+        }
+        .breakpoint-title {
+            font-weight: bold;
+            color: #dc3545;
+            margin-bottom: 10px;
+        }
+        .breakpoint-code {
+            background: #f8f9fa;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 3px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 10px;
+            border-radius: 3px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🐛 Template Breakpoint Demo</h1>
+    
+    <div class="warning">
+        <strong>⚠️ Warning:</strong> These breakpoints will stop template rendering. Use them carefully!
+    </div>
+    
+    <!-- Method 1: Simple Breakpoint -->
+    <div class="breakpoint-section">
+        <div class="breakpoint-title">1. Simple Template Breakpoint</div>
+        <div class="breakpoint-code">
+            {% load debug_tags %}
+            {% breakpoint "Stopping template rendering here" %}
+        </div>
+        <p><strong>Usage:</strong> <code>{% verbatim %}{% breakpoint "message" %}{% endverbatim %}</code></p>
+        <p><strong>Effect:</strong> Stops template rendering with exception</p>
+    </div>
+    
+    <!-- Method 2: Conditional Breakpoint -->
+    <div class="breakpoint-section">
+        <div class="breakpoint-title">2. Conditional Breakpoint</div>
+        <div class="breakpoint-code">
+            {% comment %}Example: Only break if there are too many movies{% endcomment %}
+            {% if movies_count > 5 %}
+                {% conditional_breakpoint True "Too many movies!" %}
+            {% endif %}
+            
+            {% comment %}Or use a simple boolean condition{% endcomment %}
+            {% conditional_breakpoint False "This won't trigger" %}
+        </div>
+        <p><strong>Usage:</strong> <code>{% verbatim %}{% conditional_breakpoint True "message" %}{% endverbatim %}</code></p>
+        <p><strong>Effect:</strong> Only stops when condition is true</p>
+        <p><strong>Note:</strong> Use <code>{% verbatim %}{% if %}{% endverbatim %}</code> tags for complex conditions like movies.count > 5</p>
+    </div>
+    
+    <!-- Method 3: Variable Debug Breakpoint -->
+    <div class="breakpoint-section">
+        <div class="breakpoint-title">3. Variable Debug Breakpoint</div>
+        <div class="breakpoint-code">
+            {% debug_breakpoint 'movies' %}
+        </div>
+        <p><strong>Usage:</strong> <code>{% verbatim %}{% debug_breakpoint 'variable_name' %}{% endverbatim %}</code></p>
+        <p><strong>Effect:</strong> Shows variable info before stopping</p>
+    </div>
+    
+    <!-- Method 4: JavaScript Breakpoint -->
+    <div class="breakpoint-section">
+        <div class="breakpoint-title">4. JavaScript Breakpoint</div>
+        <div class="breakpoint-code">
+            {% js_breakpoint "JavaScript breakpoint hit" %}
+        </div>
+        <p><strong>Usage:</strong> <code>{% verbatim %}{% js_breakpoint "message" %}{% endverbatim %}</code></p>
+        <p><strong>Effect:</strong> Breaks in browser dev tools</p>
+    </div>
+    
+    <!-- Method 5: Logging Breakpoint -->
+    <div class="breakpoint-section">
+        <div class="breakpoint-title">5. Logging Breakpoint</div>
+        <div class="breakpoint-code">
+            {% log_breakpoint "Template breakpoint logged" %}
+        </div>
+        <p><strong>Usage:</strong> <code>{% verbatim %}{% log_breakpoint "message" %}{% endverbatim %}</code></p>
+        <p><strong>Effect:</strong> Logs to Django logs without stopping</p>
+    </div>
+    
+    <!-- Method 6: Variable Inspection -->
+    <div class="breakpoint-section">
+        <div class="breakpoint-title">6. Variable Inspection</div>
+        <div class="breakpoint-code">
+            {% inspect_var 'movies' %}
+            <!-- Or with stop: {% inspect_var 'movies' stop %} -->
+        </div>
+        <p><strong>Usage:</strong> <code>{% verbatim %}{% inspect_var 'variable' %}{% endverbatim %}</code> or <code>{% verbatim %}{% inspect_var 'variable' stop %}{% endverbatim %}</code></p>
+        <p><strong>Effect:</strong> Shows variable info, optionally stops</p>
+    </div>
+    
+    <!-- Method 7: Context Inspection -->
+    <div class="breakpoint-section">
+        <div class="breakpoint-title">7. Context Inspection</div>
+        <div class="breakpoint-code">
+            {% inspect_context %}
+            <!-- Or with stop: {% inspect_context stop %} -->
+        </div>
+        <p><strong>Usage:</strong> <code>{% verbatim %}{% inspect_context %}{% endverbatim %}</code> or <code>{% verbatim %}{% inspect_context stop %}{% endverbatim %}</code></p>
+        <p><strong>Effect:</strong> Shows all context variables</p>
+    </div>
+    
+    <!-- Method 8: Template Syntax Error Breakpoint -->
+    <div class="breakpoint-section">
+        <div class="breakpoint-title">8. Template Syntax Error Breakpoint</div>
+        <div class="breakpoint-code">
+            {% template_breakpoint "Syntax error breakpoint" %}
+        </div>
+        <p><strong>Usage:</strong> <code>{% verbatim %}{% template_breakpoint "message" %}{% endverbatim %}</code></p>
+        <p><strong>Effect:</strong> Stops with template syntax error</p>
+    </div>
+    
+    <!-- Demo Data -->
+    <div class="breakpoint-section">
+        <div class="breakpoint-title">📊 Demo Data</div>
+        <p><strong>Movies count:</strong> {{ movies_count }}</p>
+        <p><strong>Template name:</strong> {{ template_name }}</p>
+        <p><strong>View name:</strong> {{ view_name }}</p>
+        <p><strong>App name:</strong> {{ app_name }}</p>
+    </div>
+    
+    <!-- JavaScript Breakpoint Demo -->
+    <div class="breakpoint-section">
+        <div class="breakpoint-title">🔧 JavaScript Breakpoint Demo</div>
+        <script>
+            console.log('Template loaded successfully');
+            console.log('Movies count:', {{ movies.count }});
+            
+            // Uncomment the line below to test JavaScript breakpoint
+            // debugger;
+            
+            // Conditional JavaScript breakpoint
+            {% if movies_count > 3 %}
+                console.log('Conditional breakpoint: Too many movies');
+                // debugger; // Uncomment to break here
+            {% endif %}
+        </script>
+    </div>
+    
+    <!-- Instructions -->
+    <div class="breakpoint-section">
+        <div class="breakpoint-title">📋 How to Use Template Breakpoints</div>
+        <ol>
+            <li><strong>VS Code Debugger:</strong> Set breakpoints in views before template rendering</li>
+            <li><strong>Template Breakpoints:</strong> Use <code>{% verbatim %}{% breakpoint %}{% endverbatim %}</code> tags in templates</li>
+            <li><strong>JavaScript Breakpoints:</strong> Use <code>{% verbatim %}{% js_breakpoint %}{% endverbatim %}</code> for browser debugging</li>
+            <li><strong>Conditional Breakpoints:</strong> Use <code>{% verbatim %}{% conditional_breakpoint %}{% endverbatim %}</code> for conditional stopping</li>
+            <li><strong>Variable Inspection:</strong> Use <code>{% verbatim %}{% inspect_var %}{% endverbatim %}</code> to examine variables</li>
+            <li><strong>Logging Breakpoints:</strong> Use <code>{% verbatim %}{% log_breakpoint %}{% endverbatim %}</code> for non-stopping debugging</li>
+        </ol>
+    </div>
+    
+    <!-- VS Code Integration -->
+    <div class="breakpoint-section">
+        <div class="breakpoint-title">🎯 VS Code Integration</div>
+        <p><strong>To debug templates in VS Code:</strong></p>
+        <ol>
+            <li>Start VS Code debugger (F5)</li>
+            <li>Set breakpoints in your views</li>
+            <li>Visit this page in browser</li>
+            <li>Breakpoints will trigger in VS Code</li>
+            <li>Inspect variables in debugger</li>
+        </ol>
+    </div>
+    
+    <!-- Production Warning -->
+    <div class="warning">
+        <strong>🚨 Production Warning:</strong> 
+        Remove all breakpoint tags before deploying to production!
+        Breakpoints will cause errors in production.
+    </div>
+    
+</body>
+</html>

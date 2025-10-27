@@ -71,6 +71,10 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
+            "debug": DEBUG,  # Enable template debugging
+            "builtins": [
+                "movies.templatetags.debug_tags",  # Auto-load debug tags
+            ],
         },
     },
 ]

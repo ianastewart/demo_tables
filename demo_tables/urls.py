@@ -23,6 +23,9 @@ urlpatterns = [
         "row_click_custom/", MoviesRowClickCustomView.as_view(), name="row_click_custom"
     ),
     path("action/", ActionPageView.as_view(), name="action_page"),
+    path("debug/", TemplateDebugView.as_view(), name="template_debug"),
+    path("breakpoints/", TemplateBreakpointDemoView.as_view(), name="template_breakpoints"),
+    path("breakpoint-test/", TemplateBreakpointTestView.as_view(), name="template_breakpoint_test"),
     path("detail/<int:pk>/", MovieDetailView.as_view(), name="movie_detail"),
     path("modal/<int:pk>/", MovieModalView.as_view(), name="movie_modal"),
 ]

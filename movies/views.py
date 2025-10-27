@@ -23,7 +23,7 @@ class MoviesListView(ListView):
 
 
 class BasicView(TableauxView):
-    title = "Basic view"
+    title = "Basic table"
     caption = "This table has a caption"
     table_class = MovieTable
     template_name = "movies/table.html"
@@ -38,6 +38,7 @@ class BasicViewNew(TableauxView):
 
     def get_bulk_actions(self):
         return (("action_message", "Action with message"),)
+
 
 class RowColSettingsView(TableauxView):
     title = "Row and column settings"
@@ -236,4 +237,62 @@ class MovieModalView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["return"] = self.request.GET.get("return")
+        return context
+
+
+class TemplateDebugView(TemplateView):
+    """
+    Debug view for testing template debugging functionality.
+    """
+    template_name = "movies/debug_template.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["movies"] = Movie.objects.all().order_by("title")[:10]
+        context["template_name"] = self.template_name
+        context["view_name"] = self.__class__.__name__
+        context["app_name"] = "movies"
+        
+        # Add some test data for debugging
+        context["test_string"] = "Hello Debug World!"
+        context["test_number"] = 42
+        context["test_list"] = [1, 2, 3, 4, 5]
+        context["test_dict"] = {"key1": "value1", "key2": "value2"}
+        
+        return context
+
+
+class TemplateBreakpointDemoView(TemplateView):
+    """
+    Demo view for testing template breakpoint functionality.
+    """
+    template_name = "movies/template_breakpoint_demo.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        movies = Movie.objects.all().order_by("title")[:10]
+        context["movies"] = movies
+        context["movies_count"] = movies.count()
+        context["template_name"] = self.template_name
+        context["view_name"] = self.__class__.__name__
+        context["app_name"] = "movies"
+        
+        # Add test data for breakpoint demonstrations
+        context["test_string"] = "Breakpoint Test String"
+        context["test_number"] = 42
+        context["test_list"] = [1, 2, 3, 4, 5]
+        context["test_dict"] = {"key1": "value1", "key2": "value2"}
+        
+        return context
+
+
+class TemplateBreakpointTestView(TemplateView):
+    """
+    Simple test view for template breakpoint functionality.
+    """
+    template_name = "movies/template_breakpoint_test.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["movies"] = Movie.objects.all().order_by("title")[:5]
         return context

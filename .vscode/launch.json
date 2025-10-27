@@ -1,0 +1,82 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Django: Debug Server",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "runserver",
+                "127.0.0.1:8000",
+                "--noreload"
+            ],
+            "django": true,
+            "autoReload": {
+                "enable": true
+            },
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "DJANGO_SETTINGS_MODULE": "demo_tables.settings"
+            },
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "showReturnValue": true
+        },
+        {
+            "name": "Django: Debug Templates",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "runserver",
+                "127.0.0.1:8000",
+                "--noreload"
+            ],
+            "django": true,
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "DJANGO_SETTINGS_MODULE": "demo_tables.settings",
+                "DJANGO_TEMPLATE_DEBUG": "True"
+            },
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "showReturnValue": true
+        },
+        {
+            "name": "Django: Debug Tests",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "test",
+                "movies.tests"
+            ],
+            "django": true,
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "DJANGO_SETTINGS_MODULE": "demo_tables.settings"
+            },
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Django: Debug Shell",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "shell"
+            ],
+            "django": true,
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "DJANGO_SETTINGS_MODULE": "demo_tables.settings"
+            },
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

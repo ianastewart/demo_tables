@@ -1,21 +1,11 @@
-{% extends "movies/base_bootstrap.html" %}
+{% extends "movies/base.html" %}
 {% load bootstrap4 static %}
 {% block head %}
 {% include templates.block_head %}
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
->
-{% endblock %}
-{% block navbar %}
-{% include "movies/navbar_bootstrap.html" %}
 {% endblock %}
 {% block content %}
   <div class="container">
     <h3 class="text-center">{{ view.title }}</h3>
-{#    <div id="messages">#}
-{#    {% bootstrap_messages %}#}
-{#    </div>#}
     {% include templates.block_content %}
   </div>
 {% endblock %}

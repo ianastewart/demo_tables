@@ -14,16 +14,14 @@ class MovieTable(tables.Table):
             "revenue",
             "runtime",
         )
-        attrs = {
-            "class": "table table-sm table-hover",
-            "thead": {"class": "border-top border-bottom sticky "},
-            "th": {"class": "border-top border-bottom sticky"},
-        }
+        attrs = {"class": "table table-sm table-hover"}
+        #     "thead": {"class": "border-top border-bottom sticky "},
+        #     "th": {"class": "border-top border-bottom sticky"},
+        # }
 
     budget = CurrencyColumn(prefix="$", attrs={"class": "bg-danger"})
     revenue = CurrencyColumn(prefix="$")
-    # runtime = RightAlignedColumn()
-    runtime = tables.Column()
+    runtime = RightAlignedColumn()
 
 
 class MovieTableSelection(tables.Table):
@@ -38,17 +36,15 @@ class MovieTableSelection(tables.Table):
             "runtime",
         )
         sequence = ("selection",)
-        attrs = {
-            "class": "table table-sm table-hover hover-link",
-            "thead": {"class": "bg-light border-top border-bottom"},
-        }
+        # attrs = {
+        #     "class": "table table-sm table-hover hover-link",
+        #     "thead": {"class": "bg-light border-top border-bottom"},
+        # }
 
     selection = SelectionColumn()
     budget = CurrencyColumn(prefix="$")
     revenue = CurrencyColumn(prefix="$")
     runtime = RightAlignedColumn()
-
-
 
 
 class MovieTableResponsive(tables.Table):
@@ -63,7 +59,7 @@ class MovieTableResponsive(tables.Table):
             "runtime",
         )
         # sequence = ("selection",)
-        attrs = {"class": "table table-sm table-hover hover-link"}
+        # attrs = {"class": "table table-sm table-hover hover-link"}
 
         columns_lg = {
             "fixed": ["selection", "title", "budget", "popularity", "release_date"],
@@ -75,7 +71,7 @@ class MovieTableResponsive(tables.Table):
                 "release_date",
                 "revenue",
                 "runtime",
-            ]
+            ],
         }
         columns_md = {
             "fixed": ["selection", "title", "budget", "popularity"],

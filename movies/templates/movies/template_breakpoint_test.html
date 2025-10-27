@@ -1,0 +1,52 @@
+{% comment %}
+Simple Template Breakpoint Test Page
+{% endcomment %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template Breakpoint Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>🐛 Template Breakpoint Test</h1>
+    
+    <!-- Test 1: Simple breakpoint -->
+    <div class="test-section">
+        <h3>Test 1: Simple Breakpoint</h3>
+        <p>This should work: {% breakpoint "Simple test breakpoint" %}</p>
+    </div>
+    
+    <!-- Test 2: Conditional breakpoint -->
+    <div class="test-section">
+        <h3>Test 2: Conditional Breakpoint</h3>
+        <p>This should work: {% conditional_breakpoint False "This won't trigger" %}</p>
+    </div>
+    
+    <!-- Test 3: Variable inspection -->
+    <div class="test-section">
+        <h3>Test 3: Variable Inspection</h3>
+        <p>Movies count: {{ movies.count }}</p>
+        <p>This should work: {% inspect_var 'movies' %}</p>
+    </div>
+    
+    <!-- Test 4: JavaScript breakpoint -->
+    <div class="test-section">
+        <h3>Test 4: JavaScript Breakpoint</h3>
+        <p>This should work: {% js_breakpoint "JavaScript test" %}</p>
+    </div>
+    
+    <!-- Test 5: Logging breakpoint -->
+    <div class="test-section">
+        <h3>Test 5: Logging Breakpoint</h3>
+        <p>This should work: {% log_breakpoint "Logging test" %}</p>
+    </div>
+    
+    <p><strong>Note:</strong> This is a simplified test page to identify template syntax issues.</p>
+</body>
+</html>

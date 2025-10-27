@@ -1,0 +1,58 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+
+/* Navbar container */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    background-color: #333;
+    padding: 0.5rem 1rem;
+    color: white;
+}
+
+.navbar .brand {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+.demo .dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.demo .dropdown select {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 0.4rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.demo .dropdown select:hover {
+    background-color: #555;
+}
+
+/* Make sure the page looks clean */
+main {
+    padding: 2rem;
+}
+

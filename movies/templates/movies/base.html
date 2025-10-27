@@ -1,23 +1,55 @@
-{% load static django_htmx %}
+{% load static django_htmx django_tableaux %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ title }}</title>
-{% block styles %}
-{% endblock %}
-{% htmx_script %}
-{% block head %}
-{% endblock %}
+<link rel="stylesheet" href="{% static "normalize.css" %}">
+<link rel="stylesheet" href="{% static "demo.css" %}">
+  {% htmx_script %}
+  {% block head %}
+  {% endblock %}
+
 </head>
-<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-{% block navbar %}
-{% endblock %}
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' style="background-color: #f5e7d2">
+
+<nav class="navbar demo" role="navigation" aria-label="Main navigation">
+  <div class="brand">Django Tableaux Demo</div>
+  <div class="dropdown">
+    <label for="pageSelector" class="visually-hidden">Select a demo page</label>
+    <select id="pageSelector" aria-label="Navigate to demo pages">
+      <option value="">Select a demo...</option>
+      <option value={% url "basic" %}>Basic table</option>
+      <option value={% url "basic-new" %}>Basic table new</option>
+      <option value={% url "row_col" %}>Row & column settings</option>
+      <option value={% url "select_actions" %}>Selection and actions</option>
+      <option value={% url "infinite_scroll" %}>Infinite scroll with sticky header</option>
+      <option value={% url "infinite_load" %}>Infinite load with sticky header</option>
+      <option value={% url "filter_toolbar" %}>Filter toolbar</option>
+      <option value={% url "filter_modal" %}>Filter modal</option>
+      <option value={% url "filter_header" %}>Filter in header</option>
+      <option value={% url "row_click" %}>Click row shows detail page</option>
+      <option value={% url "row_click_modal" %}>Click row shows detail modal</option>
+      <option value={% url "row_click_custom" %}>Custom row click action</option>
+      <option value={% url "editable" %}>Editable columns</option>
+    </select>
+  </div>
+</nav>
 {% block content %}
 {% endblock %}
+{% django_tableaux_script %}
 {% block scripts %}
 {% endblock %}
-{% django_htmx_script %}
+<script>
+    const pageSelector = document.getElementById('pageSelector');
+
+    pageSelector.addEventListener('change', function () {
+        const selectedPage = this.value;
+        if (selectedPage) {
+            window.location.href = selectedPage;
+        }
+    });
+</script>
 </body>
 </html>

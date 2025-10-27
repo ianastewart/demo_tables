@@ -1,0 +1,157 @@
+{% comment %}
+Template debugging example for movies app
+This template demonstrates various debugging techniques
+{% endcomment %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template Debugging Example</title>
+    <style>
+        .debug-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 2px solid #007acc;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .debug-title {
+            font-weight: bold;
+            color: #007acc;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Django Template Debugging Demo</h1>
+    
+    <!-- Method 1: Debug all context variables -->
+    <div class="debug-section">
+        <div class="debug-title">🐛 All Context Variables</div>
+        {% debug %}
+    </div>
+    
+    <!-- Method 2: Debug specific variables -->
+    <div class="debug-section">
+        <div class="debug-title">🎯 Movies Variable Debug</div>
+        {% debug_var 'movies' %}
+    </div>
+    
+    <!-- Method 3: Debug request object -->
+    <div class="debug-section">
+        <div class="debug-title">🌐 Request Debug</div>
+        {% debug_request %}
+    </div>
+    
+    <!-- Method 4: Debug template info -->
+    <div class="debug-section">
+        <div class="debug-title">📄 Template Info</div>
+        {% debug_template_info %}
+    </div>
+    
+    <!-- Method 5: Debug QuerySet -->
+    <div class="debug-section">
+        <div class="debug-title">🗃️ QuerySet Debug</div>
+        {% debug_queryset movies %}
+    </div>
+    
+    <!-- Method 6: Debug form (if exists) -->
+    {% if form %}
+    <div class="debug-section">
+        <div class="debug-title">📝 Form Debug</div>
+        {% debug_form form %}
+    </div>
+    {% endif %}
+    
+    <!-- Method 7: Comprehensive debug -->
+    <div class="debug-section">
+        <div class="debug-title">🔍 Comprehensive Debug</div>
+        {% debug_all %}
+    </div>
+    
+    <!-- Method 8: Manual debugging with template filters -->
+    <div class="debug-section">
+        <div class="debug-title">🛠️ Manual Debugging</div>
+        <p><strong>Movies type:</strong> {{ movies|debug_type }}</p>
+        <p><strong>Movies count:</strong> {{ movies.count }}</p>
+        <p><strong>First movie:</strong> {{ movies.first }}</p>
+        <p><strong>User type:</strong> {{ user|debug_type }}</p>
+        <p><strong>User attributes:</strong> {{ user|debug_attrs }}</p>
+    </div>
+    
+    <!-- Method 9: Conditional debugging -->
+    <div class="debug-section">
+        <div class="debug-title">🔀 Conditional Debugging</div>
+        {% if movies %}
+            <p>✅ Movies exist in context</p>
+            <p>Count: {{ movies.count }}</p>
+            {% if movies.count > 0 %}
+                <p>First movie: {{ movies.first.title }}</p>
+            {% else %}
+                <p>⚠️ Movies QuerySet is empty</p>
+            {% endif %}
+        {% else %}
+            <p>❌ No movies in context</p>
+        {% endif %}
+    </div>
+    
+    <!-- Method 10: Loop debugging -->
+    <div class="debug-section">
+        <div class="debug-title">🔄 Loop Debugging</div>
+        {% for movie in movies|slice:":3" %}
+            <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd;">
+                <p><strong>Loop counter:</strong> {{ forloop.counter }}</p>
+                <p><strong>Movie title:</strong> {{ movie.title }}</p>
+                <p><strong>Movie type:</strong> {{ movie|debug_type }}</p>
+                <p><strong>Movie methods:</strong> {{ movie|debug_methods }}</p>
+            </div>
+        {% empty %}
+            <p>No movies to display</p>
+        {% endfor %}
+    </div>
+    
+    <!-- Method 11: Template inheritance debugging -->
+    <div class="debug-section">
+        <div class="debug-title">🏗️ Template Inheritance Debug</div>
+        <p><strong>Current template:</strong> {{ template_name|default:"Unknown" }}</p>
+        <p><strong>Block content:</strong> {% block content %}This is the content block{% endblock %}</p>
+    </div>
+    
+    <!-- Method 12: Static files debugging -->
+    <div class="debug-section">
+        <div class="debug-title">📁 Static Files Debug</div>
+        <p><strong>Static URL:</strong> {% load static %}{% static 'demo.css' %}</p>
+        <p><strong>Static files available:</strong> Check browser dev tools Network tab</p>
+    </div>
+    
+    <!-- Method 13: Error debugging -->
+    <div class="debug-section">
+        <div class="debug-title">⚠️ Error Debugging</div>
+        {% comment %}
+        Uncomment the line below to test error handling:
+        {{ non_existent_variable }}
+        {% endcomment %}
+        <p>✅ No template errors detected</p>
+    </div>
+    
+    <!-- Method 14: Performance debugging -->
+    <div class="debug-section">
+        <div class="debug-title">⚡ Performance Debug</div>
+        <p><strong>Template load time:</strong> Check browser dev tools Performance tab</p>
+        <p><strong>Database queries:</strong> Use Django Debug Toolbar for detailed query analysis</p>
+    </div>
+    
+    <script>
+        // JavaScript debugging for templates
+        console.log('Template loaded successfully');
+        console.log('DOM elements:', document.querySelectorAll('.debug-section').length);
+        
+        // Debug template variables passed to JavaScript
+        {% if movies %}
+        console.log('Movies count:', {{ movies.count }});
+        {% endif %}
+    </script>
+</body>
+</html>

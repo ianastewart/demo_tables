@@ -1,0 +1,140 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Django: Run Server",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "manage.py",
+                "runserver"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Django: Run Migrations",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "manage.py",
+                "migrate"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Django: Make Migrations",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "manage.py",
+                "makemigrations"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Django: Run Tests",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "manage.py",
+                "test"
+            ],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Django: Create Superuser",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "manage.py",
+                "createsuperuser"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Django: Collect Static",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "manage.py",
+                "collectstatic",
+                "--noinput"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Python: Format with Black",
+            "type": "shell",
+            "command": "black",
+            "args": [
+                "."
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Python: Lint with Flake8",
+            "type": "shell",
+            "command": "flake8",
+            "args": [
+                "."
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
