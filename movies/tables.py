@@ -14,7 +14,7 @@ class MovieTable(tables.Table):
             "revenue",
             "runtime",
         )
-        attrs = {"class": "table table-sm table-hover"}
+        # attrs = {"class": "table table-sm table-hover"}
         #     "thead": {"class": "border-top border-bottom sticky "},
         #     "th": {"class": "border-top border-bottom sticky"},
         # }

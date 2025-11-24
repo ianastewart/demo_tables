@@ -14,12 +14,12 @@
 </head>
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' style="background-color: #f5e7d2">
 
-<nav class="navbar demo" role="navigation" aria-label="Main navigation">
+<nav class="navigation-bar demo" role="navigation" aria-label="Main navigation">
   <div class="brand">Django Tableaux Demo</div>
   <div class="dropdown">
     <label for="pageSelector" class="visually-hidden">Select a demo page</label>
     <select id="pageSelector" aria-label="Navigate to demo pages">
-      <option value="">Select a demo...</option>
+      <option value="">Select a demonstration</option>
       <option value={% url "basic" %}>Basic table</option>
       <option value={% url "basic-new" %}>Basic table new</option>
       <option value={% url "row_col" %}>Row & column settings</option>
