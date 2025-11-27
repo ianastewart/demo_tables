@@ -432,6 +432,7 @@ source = { editable = "../django_tableaux" }
 dependencies = [
     { name = "django" },
     { name = "django-bootstrap4" },
+    { name = "django-bootstrap5" },
     { name = "django-filter" },
     { name = "django-htmx" },
     { name = "django-tables2" },
@@ -443,6 +444,7 @@ dependencies = [
 requires-dist = [
     { name = "django", specifier = ">=4.2" },
     { name = "django-bootstrap4", specifier = "==25.2" },
+    { name = "django-bootstrap5" },
     { name = "django-filter", specifier = "==25.2" },
     { name = "django-htmx", specifier = "==1.26.0" },
     { name = "django-tables2", specifier = ">=2.4.1" },

@@ -1,9 +1,13 @@
 {% extends "movies/base.html" %}
 {% load django_tableaux %}
+{% block head %}
+{% include templates.block_head %}
+{% endblock %}
 {% block content %}
   <div class="container">
     <h3 class="text-center">{{ view.title }}</h3>
     {% load_table "responsive-component" %}
+{#     {% load_table "basic" %}#}
   </div>
 {% endblock %}
 

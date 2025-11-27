@@ -1,74 +1,31 @@
-<style>
-    .custom-restricted-width {
-        /* To limit the menu width to the content of the menu: */
-        display: inline-block;
-        /* Or set the width explicitly: */
-        /* width: 10em; */
-    }
-</style>
-  <div class="select-list">
-    <div class="select-title"><b>Django Tableaux Demo</b></div>
-    <div class="select-options">
-      <a class="pure-menu-link" href="{% url "basic" %}">Basic table</a>
-      <a class="pure-menu-link" href="{% url "basic-new" %}">Basic table new</a>
-      <a class="pure-menu-link" href="{% url "row_col" %}">Row & column settings</a>
-      <a class="pure-menu-link" href="{% url "select_actions" %}">Selection and actions</a>
-      <a class="pure-menu-link" href="{% url "infinite_scroll" %}">Infinite scroll with sticky header</a>
-      <a class="pure-menu-link" href="{% url "infinite_load" %}">Infinite load with sticky header</a>
-      <a class="pure-menu-link" href="{% url "filter_toolbar" %}">Filter toolbar</a>
-      <a class="pure-menu-link" href="{% url "filter_modal" %}">Filter modal</a>
-      <a class="pure-menu-link" href="{% url "filter_header" %}">Filter in header</a>
-      <a class="pure-menu-link" href="{% url "row_click" %}">Click row shows detail page</a>
-      <a class="pure-menu-link" href="{% url "row_click_modal" %}">Click row shows detail modal</a>
-      <a class="pure-menu-link" href="{% url "row_click_custom" %}">Custom row click action</a>
-      <a class="pure-menu-link" href="{% url "editable" %}">Editable columns</a>
-    </div>
+<nav class="navigation-bar demo" role="navigation" aria-label="Main navigation">
+  <div class="brand">Django Tableaux Demo</div>
+  <div class="dropdown">
+    <label for="pageSelector" class="visually-hidden">Select a demo page</label>
+    <select id="pageSelector" aria-label="Navigate to demo pages">
+      <option value="">Select a demonstration</option>
+      <option value={% url "basic" %}>Basic table</option>
+      <option value={% url "basic-new" %}>Basic table new</option>
+      <option value={% url "row_col" %}>Row & column settings</option>
+      <option value={% url "select_actions" %}>Selection and actions</option>
+      <option value={% url "infinite_scroll" %}>Infinite scroll with sticky header</option>
+      <option value={% url "infinite_load" %}>Infinite load with sticky header</option>
+      <option value={% url "filter_toolbar" %}>Filter toolbar</option>
+      <option value={% url "filter_modal" %}>Filter modal</option>
+      <option value={% url "filter_header" %}>Filter in header</option>
+      <option value={% url "row_click" %}>Click row shows detail page</option>
+      <option value={% url "row_click_modal" %}>Click row shows detail modal</option>
+      <option value={% url "row_click_custom" %}>Custom row click action</option>
+      <option value={% url "editable" %}>Editable columns</option>
+    </select>
   </div>
-
-{#<div class="pure-menu custom-restricted-width">#}
-{#    <span class="pure-menu-heading">Django Tableaux Demo</span>#}
-{#    <ul class="pure-menu-list">#}
-{#          <a class="pure-menu-link" href="{% url "basic" %}">Basic table</a>#}
-{#          <a class="pure-menu-link" href="{% url "row_col" %}">Row & column settings</a>#}
-{#          <a class="pure-menu-link" href="{% url "select_actions" %}">Selection and actions</a>#}
-{#          <a class="pure-menu-link" href="{% url "infinite_scroll" %}">Infinite scroll with sticky header</a>#}
-{#          <a class="pure-menu-link" href="{% url "infinite_load" %}">Infinite load with sticky header</a>#}
-{#          <a class="pure-menu-link" href="{% url "filter_toolbar" %}">Filter toolbar</a>#}
-{#          <a class="pure-menu-link" href="{% url "filter_modal" %}">Filter modal</a>#}
-{#          <a class="pure-menu-link" href="{% url "filter_header" %}">Filter in header</a>#}
-{#          <a class="pure-menu-link" href="{% url "row_click" %}">Click row shows detail page</a>#}
-{#          <a class="pure-menu-link" href="{% url "row_click_modal" %}">Click row shows detail modal</a>#}
-{#          <a class="pure-menu-link" href="{% url "row_click_custom" %}">Custom row click action</a>#}
-{#          <a class="pure-menu-link" href="{% url "editable" %}">Editable columns</a>#}
-{#    </ul>#}
-{#</div>#}
-{#<nav class="navbar navbar-expand-lg navbar-light bg-light">#}
-{#  <a class="navbar-brand" href="#">Tables Pro</a>#}
-{#  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">#}
-{#    <span class="navbar-toggler-icon"></span>#}
-{#  </button>#}
-{##}
-{#  <div class="collapse navbar-collapse" id="navbarSupportedContent">#}
-{#    <ul class="navbar-nav mr-auto">#}
-{#      <li class="nav-item dropdown">#}
-{#        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
-{#          Demos#}
-{#        </a>#}
-{#        <div class="dropdown-menu" aria-labelledby="navbarDropdown">#}
-{#          <a class="pure-menu-link" href="{% url "basic" %}">Basic table</a>#}
-{#          <a class="pure-menu-link" href="{% url "row_col" %}">Row & column settings</a>#}
-{#          <a class="pure-menu-link" href="{% url "select_actions" %}">Selection and actions</a>#}
-{#          <a class="pure-menu-link" href="{% url "infinite_scroll" %}">Infinite scroll with sticky header</a>#}
-{#          <a class="pure-menu-link" href="{% url "infinite_load" %}">Infinite load with sticky header</a>#}
-{#          <a class="pure-menu-link" href="{% url "filter_toolbar" %}">Filter toolbar</a>#}
-{#          <a class="pure-menu-link" href="{% url "filter_modal" %}">Filter modal</a>#}
-{#          <a class="pure-menu-link" href="{% url "filter_header" %}">Filter in header</a>#}
-{#          <a class="pure-menu-link" href="{% url "row_click" %}">Click row shows detail page</a>#}
-{#          <a class="pure-menu-link" href="{% url "row_click_modal" %}">Click row shows detail modal</a>#}
-{#          <a class="pure-menu-link" href="{% url "row_click_custom" %}">Custom row click action</a>#}
-{#          <a class="pure-menu-link" href="{% url "editable" %}">Editable columns</a>#}
-{#        </div>#}
-{#      </li>#}
-{#    </ul>#}
-{#  </div>#}
-{#</nav>#}
+</nav>
+<script>
+    const pageSelector = document.getElementById('pageSelector');
+    pageSelector.addEventListener('change', function () {
+        const selectedPage = this.value;
+        if (selectedPage) {
+            window.location.href = selectedPage;
+        }
+    });
+</script>

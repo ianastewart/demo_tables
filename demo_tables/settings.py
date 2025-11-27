@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.humanize",
     "bootstrap4",
+    "django_bootstrap5",
     "django_tables2",
     "django_filters",
     "django_htmx",
@@ -71,10 +72,11 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
+            "libraries": {
+                "bootstrap4": "bootstrap4.templatetags.bootstrap4",
+                "django_bootstrap5": "django_bootstrap5.templatetags.django_bootstrap5",
+            },
             "debug": DEBUG,  # Enable template debugging
-            "builtins": [
-                "movies.templatetags.debug_tags",  # Auto-load debug tags
-            ],
         },
     },
 ]

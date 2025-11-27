@@ -33,7 +33,7 @@ class BasicView(TableauxView):
 class BasicViewNew(TableauxView):
     title = "Basic view new"
     table_class = MovieTableResponsive
-    template_name = "movies/table_new.html"
+    template_name = "movies/table_component.html"
     model = Movie
 
     def get_bulk_actions(self):
@@ -101,7 +101,7 @@ class ActionPageView(SelectedMixin, TemplateView):
 
 
 class InfiniteScrollView(TableauxView):
-    title = "Infinite scroll"
+    title = "Infinite scroll with sticky header in fixed height of 500px"
     table_class = MovieTableSelection
     template_name = "movies/table.html"
     model = Movie
@@ -133,7 +133,7 @@ class ResponsiveView(SelectActionsView):
 
 class ResponsiveComponentView(TableauxView):
     table_class = MovieTableResponsive
-    template_name = "movies/table_new.html"
+    template_name = "movies/table_component.html"
     model = Movie
 
 
