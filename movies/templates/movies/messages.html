@@ -1,0 +1,10 @@
+{% if messages %}
+<div class="demo messages-container">
+    {% for msg in messages %}
+    <div class="demo-alert {{ msg.level_class }}">
+        <span class="alert-message">{{ msg.message }}</span>
+        <button class="alert-dismiss" onclick="this.parentElement.style.display='none'">&times;</button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

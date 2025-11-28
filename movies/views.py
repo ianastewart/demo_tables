@@ -213,11 +213,9 @@ class MoviesRowClickCustomView(TableauxView):
         movie = Movie.objects.get(pk=pk)
         context = {
             "message": f"'{movie.title}', primary key: {pk}, column: {column_name} was clicked.",
-            "alert_class": "alert-success",
+            "alert_class": "alert-info",
         }
-        response = render(
-            self.request, "django_tableaux/bootstrap4/alert.html", context
-        )
+        response = render(self.request, "movies/message.html", context)
         return retarget(response, "#messages")
 
 
