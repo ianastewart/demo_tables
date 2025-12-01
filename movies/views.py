@@ -110,6 +110,7 @@ class InfiniteScrollView(TableauxView):
     infinite_scroll = True
     sticky_header = True
     fixed_height = 500
+    indicator = True
 
     def get_bulk_actions(self):
         return (("action_message", "Action with message"),)
