@@ -1,23 +1,8 @@
 -- https://github.com/bbrumm/databasestar/tree/main/sample_databases/sample_db_movies
-drop table movies_movie;
-create table movies_movie
-(
-    id           integer not null
-        primary key autoincrement,
-    title        varchar(1000),
-    budget       integer,
-    homepage     varchar(1000),
-    overview     varchar(1000),
-    popularity   decimal,
-    release_date date,
-    revenue      bigint,
-    runtime      integer,
-    movie_status varchar(50),
-    tagline      varchar(1000),
-    vote_average decimal,
-    vote_count   integer
-);
-INSERT INTO movies_movie VALUES
+/* drop table movies_movie; */
+INSERT INTO movies_movie
+(id, title, budget,homepage,overview,popularity,release_date,revenue,runtime,movie_status,tagline,vote_average,vote_count)
+VALUES
 (5,'Four Rooms',4000000,'','It''s Ted the Bellhop''s first night on the job...and the hotel''s very unusual guests are about to place him in some outrageous predicaments. It seems that this evening''s room service is serving up one unbelievable happening after another.',22.876230,'1995-12-09',4300000,98,'Released','Twelve outrageous guests. Four scandalous requests. And one lone bellhop, in his first day on the job, who''s in for the wildest New year''s Eve of his life.',6.50,530),
 (11,'Star Wars',11000000,'http://www.starwars.com/films/star-wars-episode-iv-a-new-hope','Princess Leia is captured and held hostage by the evil Imperial forces in their effort to take over the galactic Empire. Venturesome Luke Skywalker and dashing captain Han Solo team together with the loveable robot duo R2-D2 and C-3PO to rescue the beautiful princess and restore peace and justice in the Empire.',126.393695,'1977-05-25',775398007,121,'Released','A long time ago in a galaxy far, far away...',8.10,6624),
 (12,'Finding Nemo',94000000,'http://movies.disney.com/finding-nemo','Nemo, an adventurous young clownfish, is unexpectedly taken from his Great Barrier Reef home to a dentist''s office aquarium. It''s up to his worrisome father Marlin and a friendly but forgetful fish Dory to bring Nemo home -- meeting vegetarian sharks, surfer dude turtles, hypnotic jellyfish, hungry seagulls, and more along the way.',85.688789,'2003-05-30',940335536,100,'Released','There are 3.7 trillion fish in the ocean, they''re looking for one.',7.60,6122),
@@ -299,3 +284,4 @@ INSERT INTO movies_movie VALUES
 (630,'The Wizard of Oz',2777000,'http://thewizardofoz.warnerbros.com/','Young Dorothy finds herself in a magical world where she makes friends with a lion, a scarecrow and a tin man as they make their way along the yellow brick road to talk with the Wizard and ask for the things they miss most in their lives. The Wicked Witch of the West is the only thing that could stop them.',67.417542,'1939-08-15',33754967,102,'Released','We''re off to see the Wizard, the wonderful Wizard of Oz!',7.40,1642),
 (634,'Bridget Jones''s Diary',25000000,'','A chaotic Bridget Jones meets a snobbish lawyer, and he soon enters her world of imperfections.',35.310712,'2001-04-13',281929795,97,'Released','Health Warning: Adopting Bridget''s lifestyle could seriously damage your health.',6.50,1356),
 (639,'When Harry Met Sally...',16000000,'','During their travels from Chicago to New York, Harry and Sally Will debate whether or not sex ruins a perfect relationship between a man and a woman. Eleven years and later, they''re still no closer to finding the answer.',18.430419,'1989-07-21',92823546,96,'Released','Can two friends sleep together and still love each other in the morning?',7.30,950);
+

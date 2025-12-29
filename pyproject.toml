@@ -57,14 +57,34 @@ docs = [
 ]
 
 [tool.uv.sources]
-django-tableaux = { path = "C:/Users/is/PycharmProjects/django_tableaux", editable = true}
+#django-tableaux = { path = "C:/Users/is/PycharmProjects/django_tableaux", editable = true}
 django-flatpickr = { git="https://github.com/ianastewart/django-flatpickr.git", branch="master"}
-#[tool.uv.extra-build-dependencies]
+#django-tableaux = { path = "C:/Users/is/PycharmProjects/django_tableaux", editable = true}
+django-tableaux = { path = "/home/ian/PycharmProjects/django_tableaux", editable = true}
+#
+[tool.uv.extra-build-dependencies]
 #demo-tables = ["uv.build"]
 #[build-system]
 #requires = ["uv"]
 #build-backend = "uv.build"
 
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
 
 [tool.mypy]
 python_version = "3.9"

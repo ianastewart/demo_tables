@@ -7,7 +7,7 @@ class Movie(models.Model):
     """
     Movie model representing film data with comprehensive metadata.
     """
-    
+    id = models.BigAutoField(primary_key=True)
     # Basic Information
     title = models.CharField(
         max_length=1000, 
@@ -95,27 +95,13 @@ class Movie(models.Model):
         help_text="Official movie website URL"
     )
     
-    # Timestamps
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        help_text="When this record was created"
-    )
-    updated_at = models.DateTimeField(
-        auto_now=True,
-        help_text="When this record was last updated"
-    )
-
     class Meta:
         verbose_name = "Movie"
         verbose_name_plural = "Movies"
-        ordering = ['-release_date', 'title']
+        ordering = ['title']
         indexes = [
             models.Index(fields=['title']),
             models.Index(fields=['release_date']),
-            models.Index(fields=['vote_average']),
-            models.Index(fields=['popularity']),
-            models.Index(fields=['movie_status']),
-            models.Index(fields=['created_at']),
         ]
         constraints = [
             models.CheckConstraint(

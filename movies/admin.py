@@ -21,14 +21,11 @@ class MovieAdmin(admin.ModelAdmin):
         'profit_display',
         'vote_average', 
         'runtime_formatted',
-        'created_at'
-    ]
+         ]
     
     list_filter = [
         'movie_status',
         'release_date',
-        'created_at',
-        'updated_at',
     ]
     
     search_fields = [
@@ -43,8 +40,6 @@ class MovieAdmin(admin.ModelAdmin):
     ]
     
     readonly_fields = [
-        'created_at',
-        'updated_at',
         'profit_display',
         'profit_margin_display',
         'runtime_formatted',
@@ -69,13 +64,9 @@ class MovieAdmin(admin.ModelAdmin):
             'fields': ('is_released', 'is_successful'),
             'classes': ('collapse',)
         }),
-        ('Timestamps', {
-            'fields': ('created_at', 'updated_at'),
-            'classes': ('collapse',)
-        }),
     )
     
-    ordering = ['-release_date', 'title']
+    ordering = ['title']
     date_hierarchy = 'release_date'
     list_per_page = 25
     
