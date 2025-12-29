@@ -28,16 +28,12 @@ class BasicView(TableauxView):
     table_class = MovieTable
     template_name = "movies/table.html"
     model = Movie
+    update_url = False
 
 
-class BasicViewNew(TableauxView):
+class BasicViewNew(TemplateView):
     title = "Basic view new"
-    table_class = MovieTableResponsive
     template_name = "movies/table_component.html"
-    model = Movie
-
-    def get_bulk_actions(self):
-        return (("action_message", "Action with message"),)
 
 
 class RowColSettingsView(TableauxView):
@@ -63,7 +59,6 @@ class SelectActionsView(TableauxView):
 
     def get_bulk_actions(self):
         return (
-            ("action_message", "Action with message"),
             ("action_modal", "Action in a modal"),
             ("action_page", "Action on a new page"),
             ("export", "Export to csv"),
@@ -71,23 +66,16 @@ class SelectActionsView(TableauxView):
         )
 
     def handle_action(self, request, action):
-        if action == "action_message":
-            context = {
-                "message": f"Action on {self.selected_objects.count()} rows",
-                "alert_class": "alert-success",
-            }
-            response = render(request, self.templates["alert"], context)
-            return retarget(response, "#messages")
-
-        elif action == "action_modal":
+        if action == "action_modal":
             context = {"selected": self.selected_objects}
             return render(request, "movies/action_modal.html", context)
 
         elif action == "action_page":
             request.session["selected_ids"] = self.selected_ids
-            path = reverse("action_page") + request.POST["query"]
+            request.session["return_url"] = self.return_url
+            path = reverse("action_page")
             return HttpResponseClientRedirect(path)
-
+        raise ValueError(f"Django tableaux: action {action} has no handler")
 
 class ActionPageView(SelectedMixin, TemplateView):
     model = Movie
@@ -97,6 +85,7 @@ class ActionPageView(SelectedMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["movies"] = self.get_query_set()
+        context["return_url"] = self.return_url
         return context
 
 
@@ -128,8 +117,8 @@ class InfiniteLoadView(TableauxView):
 class ResponsiveView(SelectActionsView):
     title = "Responsive"
     table_class = MovieTableResponsive
-    template_name = "movies/table.html"
-    model = Movie
+    # template_name = "movies/table.html"
+    # model = Movie
 
 
 class ResponsiveComponentView(TableauxView):
@@ -142,12 +131,15 @@ class MoviesFilterToolbarView(SelectActionsView):
     title = "Filter toolbar"
     table_class = MovieTableResponsive
     filterset_class = MovieFilter
+    model = Movie
     filter_style = TableauxView.FilterStyle.TOOLBAR
-    template_name = "movies/table.html"
     column_settings = True
     row_settings = True
     responsive = True
-    model = Movie
+    update_url = False
+    filter_button = False
+    filter_pills = True
+
 
 
 class MoviesFilterModalView(SelectActionsView):
@@ -160,6 +152,9 @@ class MoviesFilterModalView(SelectActionsView):
     row_settings = True
     responsive = True
     model = Movie
+    filter_button = True
+    filter_pills = True
+    update_url = False
 
 
 class MoviesFilterHeaderView(SelectActionsView):

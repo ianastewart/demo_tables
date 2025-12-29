@@ -1,5 +1,8 @@
-{% extends "movies/table.html" %}
-{% load humanize %}
+{% extends "movies/base.html" %}
+{% load static  humanize %}
+{% block head %}
+  <script src="{% static "movies/demo.css" %}"></script>
+{% endblock %}
 {% block content %}
 <div class="container">
 <h1>{{ view.title}}</h1>

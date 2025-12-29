@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django_filters",
     "django_htmx",
     "django_tableaux",
+    "django_flatpickr",
     "movies",
 ]
 
@@ -140,3 +141,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 BOOTSTRAP4 = {"error_css_class": "", "success_css_class": ""}
 # DJANGO_TABLEAUX_LIBRARY = "templates/my_library"
 DJANGO_TABLEAUX_LIBRARY = "bootstrap5"
+
+DJANGO_FLATPICKR = {
+    "theme_name": "material_green",
+    "options": {
+        # 'locale': 'bn',  # locale option can be set here only
+        "altFormat": "d/m/Y",  # reflects in altFormat
+        "allowInput": True,
+    },
+}
