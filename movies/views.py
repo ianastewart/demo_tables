@@ -117,6 +117,7 @@ class InfiniteLoadView(TableauxView):
 class ResponsiveView(SelectActionsView):
     title = "Responsive"
     table_class = MovieTableResponsive
+    column_settings = True
     # template_name = "movies/table.html"
     # model = Movie
 

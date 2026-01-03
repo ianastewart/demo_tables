@@ -57,6 +57,7 @@ class MovieTableResponsive(tables.Table):
             "release_date",
             "revenue",
             "runtime",
+            "movie_status",
         )
         # sequence = ("selection",)
         # attrs = {"class": "table table-sm table-hover hover-link"}
@@ -71,6 +72,7 @@ class MovieTableResponsive(tables.Table):
                 "release_date",
                 "revenue",
                 "runtime",
+                "movie_status",
             ],
         }
         columns_md = {
