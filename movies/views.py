@@ -118,8 +118,7 @@ class ResponsiveView(SelectActionsView):
     title = "Responsive"
     table_class = MovieTableResponsive
     column_settings = True
-    # template_name = "movies/table.html"
-    # model = Movie
+    infinite_load = True
 
 
 class ResponsiveComponentView(TableauxView):
@@ -155,7 +154,7 @@ class MoviesFilterModalView(SelectActionsView):
     model = Movie
     filter_button = True
     filter_pills = True
-    update_url = False
+    prefix="X"
 
 
 class MoviesFilterHeaderView(SelectActionsView):

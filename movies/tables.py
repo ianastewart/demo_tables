@@ -60,7 +60,13 @@ class MovieTableResponsive(tables.Table):
             "movie_status",
         )
         # sequence = ("selection",)
-        # attrs = {"class": "table table-sm table-hover hover-link"}
+        attrs = {"class": "table table-sm table-hover hover-link",
+                 "th": {"class": "strong bg-dark text-white", "style": "white-space:nowrap;"},
+                 }
+
+        columns_xl = {
+            "fixed": ["selection", "title", "budget", "popularity", "release_date", "runtime", "movie_status"],
+        }
 
         columns_lg = {
             "fixed": ["selection", "title", "budget", "popularity", "release_date"],
@@ -70,9 +76,6 @@ class MovieTableResponsive(tables.Table):
                 "budget",
                 "popularity",
                 "release_date",
-                "revenue",
-                "runtime",
-                "movie_status",
             ],
         }
         columns_md = {
@@ -85,7 +88,7 @@ class MovieTableResponsive(tables.Table):
             "mobile": True,
             "attrs": {"th": "strong bg-dark text-white", "tr": "bg-light"},
         }
-        responsive = {"sm": columns_sm, "md": columns_md, "lg": columns_lg}
+        responsive = {"sm": columns_sm, "md": columns_md, "lg": columns_lg, "xl": columns_xl}
 
     selection = SelectionColumn()
     budget = CurrencyColumn(prefix="$")
