@@ -19,7 +19,7 @@ class MovieTable(tables.Table):
         #     "th": {"class": "border-top border-bottom sticky"},
         # }
 
-    budget = CurrencyColumn(prefix="$", attrs={"class": "bg-danger"})
+    budget = CurrencyColumn(prefix="$")
     revenue = CurrencyColumn(prefix="$")
     runtime = RightAlignedColumn()
 
@@ -61,7 +61,7 @@ class MovieTableResponsive(tables.Table):
         )
         # sequence = ("selection",)
         attrs = {"class": "table table-sm table-hover hover-link",
-                 "th": {"class": "strong bg-dark text-white", "style": "white-space:nowrap;"},
+                 "th": {"class": "bg-dark text-white no-wrap"},
                  }
 
         columns_xl = {

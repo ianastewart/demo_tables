@@ -56,6 +56,7 @@ class SelectActionsView(TableauxView):
     table_class = MovieTableSelection
     template_name = "movies/table.html"
     model = Movie
+    prefix = "X"
 
     def get_bulk_actions(self):
         return (
@@ -138,7 +139,7 @@ class MoviesFilterToolbarView(SelectActionsView):
     responsive = True
     update_url = False
     filter_button = False
-    filter_pills = True
+    filter_pills = False
 
 
 
@@ -155,6 +156,7 @@ class MoviesFilterModalView(SelectActionsView):
     filter_button = True
     filter_pills = True
     prefix="X"
+    update_url = False
 
 
 class MoviesFilterHeaderView(SelectActionsView):
