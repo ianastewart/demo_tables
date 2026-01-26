@@ -1,0 +1,32 @@
+<div class="pico container primary">
+  <nav class="pico-background-indigo-750 navigation-bar demo" role="navigation" aria-label="Main navigation">
+    <ul>
+      <li><h3><span class="pico-color-indigo-50">Django Tableaux Demo</span></h3></li>
+    </ul>
+    <ul>
+      <li class="pico-color-indigo-50">
+        <details>
+          <summary> Select a demo page
+          </summary>
+          <ul aria-label="Navigate to demo pages">
+            <li><a href="{% url "interactive" %}">Interactive view</a></li>
+            <li><a href="{% url "basic" %}">Basic table</a></li>
+            <li><a href="{% url "basic-new" %}">Basic table new</a></li>
+            <li><a href="{% url "row_col" %}">Row & column settings</a></li>
+            <li><a href="{% url "select_actions" %}">Selection and actions</a></li>
+            <li><a href="{% url "infinite_scroll" %}">Infinite scroll with sticky header</a></li>
+            <li><a href="{% url "infinite_load" %}">Infinite load with sticky header</a></li>
+            <li><a href="{% url "responsive" %}">Responsive table</a></li>
+            <li><a href="{% url "filter_toolbar" %}">Filter toolbar</a></li>
+            <li><a href="{% url "filter_modal" %}">Filter modal</a></li>
+            <li><a href="{% url "filter_header" %}">Filter in header</a></li>
+            <li><a href="{% url "row_click" %}">Click row shows detail page</a></li>
+            <li><a href="{% url "row_click_modal" %}">Click row shows detail modal</a></li>
+            <li><a href="{% url "row_click_custom" %}">Custom row click action</a></li>
+            <li><a href="{% url "editable" %}">Editable columns</a></li>
+          </ul>
+        </details>
+      </li>
+    </ul>
+  </nav>
+</div>

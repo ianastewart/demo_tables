@@ -3,11 +3,31 @@
 {% block content %}
   <div class="container">
   <h3> Component view</h3>
+    <button id="options">Options</button>
     <h3 class="text-center">{{ view.title }}</h3>
-    {% tableaux "filter_modal" prefix="A" %}
+    {% tableaux "basic" prefix="A" %}
   <hr>
-    {% tableaux "filter_toolbar" prefix="B" %}
+{#    {% tableaux "filter_toolbar" prefix="B" %}#}
   </div>
   <div id="modals-here"></div>
+{% include "movies/options_dialog.html" %}
+<script>
+const dialog = document.querySelector("dialog");
+const showButton = document.querySelector("#options");
+const closeButton = document.querySelector("dialog button");
+
+// "Show the dialog" button opens the dialog modally
+showButton.addEventListener("click", () => {
+    dialog.style.left = showButton.offsetLeft + "px";
+    dialog.style.top = showButton.offsetTop + "px";
+  dialog.showModal();
+});
+
+// "Close" button closes the dialog
+closeButton.addEventListener("click", () => {
+  dialog.close();
+});
+
+</script>
 {% endblock %}
 

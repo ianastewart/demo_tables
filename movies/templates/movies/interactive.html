@@ -1,0 +1,69 @@
+{% extends "movies/base_new.html" %}
+{% load django_tableaux static %}
+{% block head %}
+  <link rel="stylesheet" href="{% static "django_tableaux/css/dropdown.css" %}">
+  <link rel="stylesheet" href="{% static "dropdown.css" %}">
+{% endblock %}
+{% block menu %}
+  <div class="pico">
+    <div class="css-dropdown">
+      <button class="css-dropdown-toggle" aria-haspopup="true">
+        Actions ▾
+      </button>
+
+      <ul class="css-dropdown-menu" role="menu">
+        <form method="post">
+          {% csrf_token %}
+          {% for field in form %}
+            <li role="menuitemcheckbox" class="css-menuitem">
+              {% if field.widget_type == "checkbox" %}
+                {{ field }} {{ field.label|slice:"0:-1"}}
+              {% else %}
+                {{ field.label_tag }} {{ field }}
+              {% endif %}
+            </li>
+          {% endfor %}
+          <button type="submit" autofocus hx-post hx-swap="none">Apply</button>
+        </form>
+      </ul>
+    </div>
+  <form method="post" hx-post="" hx-trigger="change form input[type=checkbox] change form:select" hx-include="this" hx-swap="none">
+          {% csrf_token %}
+          {% for field in form %}
+            <li role="menuitemcheckbox" class="css-menuitem">
+              {% if field.widget_type == "checkbox" %}
+                {{ field }} {{ field.label}}
+              {% else %}
+                {{ field.label }} {{ field }}
+              {% endif %}
+            </li>
+          {% endfor %}
+  </form>
+  </div>
+{% endblock %}
+{% block content %}
+    <h3 class="text-center">{{ view.title }}</h3>
+    {% tableaux url_name %}
+  <div id="modals-here"></div>
+  {% include "movies/options_dialog.html" %}
+  <script src="{% static "django_tableaux/js/dropdown.js" %}"></script>
+  <script>
+      initDropdowns()
+      const dialog = document.querySelector("dialog");
+      const showButton = document.querySelector("#options");
+      const closeButton = document.querySelector("dialog button");
+
+      // "Show the dialog" button opens the dialog modally
+      showButton.addEventListener("click", () => {
+          dialog.style.left = showButton.offsetLeft + "px";
+          dialog.style.top = showButton.offsetTop + "px";
+          dialog.showModal();
+      });
+
+      // "Close" button closes the dialog
+      closeButton.addEventListener("click", () => {
+          dialog.close();
+      });
+
+  </script>
+{% endblock %}

@@ -1,25 +1,71 @@
+from django.http import HttpResponse
 from django.shortcuts import render, reverse
 from django.views.generic import ListView, TemplateView, DetailView
 from django_htmx.http import (
     HttpResponseClientRedirect,
-    retarget,
+    retarget, trigger_client_event,
 )
 from django_tableaux.views import TableauxView, SelectedMixin
-
+from django_tableaux.models import Pagination, FilterStyle, ClickAction
 from .filters import MovieFilter
-from .forms import MovieForm
+from .forms import MovieForm, BasicSettingsForm
 from .models import Movie
 from .tables import MovieTable, MovieTableSelection, MovieTableResponsive, MovieTable4
 
+class PlayView(TemplateView):
+    template_name = "movies/play.html"
 
-class MoviesListView(ListView):
-    model = Movie
-    template_name = "movies/list.html"
+class TableauxInteractiveView(TableauxView):
+    # Inherit the standard TableauxView and override setup so it reads parameters
+    # from the session to support the interactive demo.
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        if "TABLEAUX_SETTINGS" in request.session.keys():
+            settings = request.session["TABLEAUX_SETTINGS"]
+            for k, v in settings.items():
+                if isinstance(v, bool):
+                    self.__setattr__(k, v)
+                elif k == "pagination":
+                    self.pagination = Pagination(v)
+                elif k == "filter_style":
+                    self.filter_style = FilterStyle(v)
+                elif k == "click_action":
+                    self.clickaction = ClickAction(v)
+                elif k == "fixed_height":
+                    self.fixed_height = int(v)
+        pass
+
+
+class InteractiveView(TemplateView):
+    title = "Interactive tableaux view"
+    template_name = "movies/interactive.html"
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["movies"] = Movie.objects.all().order_by("title")
+        context = super().get_context_data()
+        initial = {}
+        if self.request.session.get("TABLEAUX_SETTINGS"):
+            initial=self.request.session["TABLEAUX_SETTINGS"]
+        context["form"] = BasicSettingsForm(initial=initial)
+        context["url_name"] = "filter_toolbar"
         return context
+
+    def post(self, request, *args, **kwargs):
+        form = BasicSettingsForm(request.POST)
+        if form.is_valid():
+            self.request.session["TABLEAUX_SETTINGS"] = {}
+            for k, v in form.cleaned_data.items():
+                self.request.session["TABLEAUX_SETTINGS"][k] = v
+            self.request.session.modified=True
+        response = HttpResponse()
+        return trigger_client_event(response, name="reloadTableaux")
+
+
+class BasicInteractiveView(TableauxInteractiveView):
+    title = "Basic table interactive"
+    caption = "This table has a caption"
+    table_class = MovieTable
+    model = Movie
 
 
 class BasicView(TableauxView):
@@ -29,11 +75,35 @@ class BasicView(TableauxView):
     template_name = "movies/table.html"
     model = Movie
     update_url = False
+    # pagination = Pagination.PAGED
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        return context
 
 
 class BasicViewNew(TemplateView):
     title = "Basic view new"
     template_name = "movies/table_component.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        initial = {}
+        if self.request.session["TABLEAUX_SETTINGS"]:
+            initial=self.request.session["TABLEAUX_SETTINGS"]
+        context["form"] = BasicSettingsForm(initial=initial)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = BasicSettingsForm(request.POST)
+        if form.is_valid():
+            self.request.session["TABLEAUX_SETTINGS"] = {}
+            for k, v in form.cleaned_data.items():
+                self.request.session["TABLEAUX_SETTINGS"][k] = v
+            self.request.session.modified=True
+        response = HttpResponse()
+        return trigger_client_event(response, name="reloadTableaux")
+
 
 
 class RowColSettingsView(TableauxView):
@@ -51,7 +121,7 @@ class RowColSettingsView(TableauxView):
         return context
 
 
-class SelectActionsView(TableauxView):
+class SelectActionsView(TableauxInteractiveView):
     title = "Selection and actions"
     table_class = MovieTableSelection
     template_name = "movies/table.html"
@@ -133,7 +203,7 @@ class MoviesFilterToolbarView(SelectActionsView):
     table_class = MovieTableResponsive
     filterset_class = MovieFilter
     model = Movie
-    filter_style = TableauxView.FilterStyle.TOOLBAR
+    filter_style = FilterStyle.TOOLBAR
     column_settings = True
     row_settings = True
     responsive = True
@@ -147,13 +217,13 @@ class MoviesFilterModalView(SelectActionsView):
     title = "Filter modal"
     table_class = MovieTableResponsive
     filterset_class = MovieFilter
-    filter_style = TableauxView.FilterStyle.MODAL
+    filter_style = FilterStyle.MODAL
     template_name = "movies/table.html"
     column_settings = True
     row_settings = True
     responsive = True
     model = Movie
-    filter_button = True
+    filter_button = False
     filter_pills = True
     prefix="X"
     update_url = False
@@ -163,7 +233,7 @@ class MoviesFilterHeaderView(SelectActionsView):
     title = "Filter in header"
     table_class = MovieTableResponsive
     filterset_class = MovieFilter
-    filter_style = TableauxView.FilterStyle.HEADER
+    filter_style = FilterStyle.HEADER
     template_name = "movies/table.html"
     column_settings = True
     row_settings = True
@@ -187,7 +257,7 @@ class MoviesRowClickView(TableauxView):
     template_name = "movies/table.html"
     table_class = MovieTable
     model = Movie
-    click_action = TableauxView.ClickAction.GET
+    click_action = ClickAction.GET
     click_url_name = "movie_detail"
 
 
@@ -196,7 +266,7 @@ class MoviesRowClickModalView(TableauxView):
     template_name = "movies/table.html"
     table_class = MovieTable
     model = Movie
-    click_action = TableauxView.ClickAction.HX_GET
+    click_action = ClickAction.HX_GET
     click_url_name = "movie_modal"
 
 
@@ -205,7 +275,7 @@ class MoviesRowClickCustomView(TableauxView):
     template_name = "movies/table.html"
     table_class = MovieTableResponsive
     model = Movie
-    click_action = TableauxView.ClickAction.CUSTOM
+    click_action = ClickAction.CUSTOM
 
     def cell_clicked(self, pk, column_name, target):
         movie = Movie.objects.get(pk=pk)

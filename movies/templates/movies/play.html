@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.container {
+  display: grid;
+  grid-template-areas:
+    "menu content";
+  grid-template-columns: 1fr 4fr;
+  gap: 10px;
+  background-color: dodgerblue;
+  padding: 10px;
+}
+.container section {
+  background-color: white;
+  padding: 10px;
+}
+
+.container section.menu {
+  background-color: lightgrey;
+  grid-area: menu;
+}
+.container section.content {
+  grid-area: content;
+}
+</style>
+</head>
+<body>
+
+<h1>CSS Grid Layout</h1>
+
+
+<div class="container">
+  <section class="menu">
+    <ul>
+      <li>aaaaaaaa</li>
+      <li>bbbbbbbbb</li>
+    </ul>
+  </section>
+  <section class="content"><h3>Lorem Ipsum</h3><p>Lorem ipsum odor amet, consectetuer adipiscing elit. Ridiculus sit nisl laoreet facilisis aliquet. Potenti dignissim litora eget montes rhoncus sapien neque urna. Cursus libero sapien integer magnis ligula lobortis quam ut.</p></section>
+</div>
+
+</body>
+</html>

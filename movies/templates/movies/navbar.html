@@ -4,6 +4,7 @@
     <label for="pageSelector" class="visually-hidden">Select a demo page</label>
     <select id="pageSelector" aria-label="Navigate to demo pages">
       <option value="">Select a demonstration</option>
+      <option value="{% url "interactive" %}">Interactive view</option>
       <option value={% url "basic" %}>Basic table</option>
       <option value={% url "basic-new" %}>Basic table new</option>
       <option value={% url "row_col" %}>Row & column settings</option>

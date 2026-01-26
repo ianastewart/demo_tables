@@ -1,0 +1,17 @@
+  <dialog>
+<form method="post">
+{% csrf_token %}
+    {% for field in form %}
+      {% if field.widget_type == "checkbox" %}
+        <label for="{{ field.id_for_label }}">
+          {{ field }}
+          {{ field.label }}
+        </label>
+      {% else %}
+        {{ field.label_tag }} {{ field }}
+      {% endif %}
+      <br/>
+{% endfor %}
+  <button class="pure-button pure-button-primary" type="submit" autofocus hx-post hx-swap="none" >Apply</button>
+</form>
+  </dialog>

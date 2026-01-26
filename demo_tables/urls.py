@@ -4,7 +4,9 @@ from movies.views import *
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("movies/", MoviesListView.as_view(), name="movies_list"),
+    path("play/", PlayView.as_view(), name="play"),
+    path("interactive/", InteractiveView.as_view(), name="interactive"),
+    path("tableaux/basic/", BasicInteractiveView.as_view(), name="basic_interactive"),
     path("", BasicView.as_view(), name="basic"),
     path("new/", BasicViewNew.as_view(), name="basic-new"),
     path("rowcol/", RowColSettingsView.as_view(), name="row_col"),

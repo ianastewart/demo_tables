@@ -14,11 +14,6 @@ class MovieTable(tables.Table):
             "revenue",
             "runtime",
         )
-        # attrs = {"class": "table table-sm table-hover"}
-        #     "thead": {"class": "border-top border-bottom sticky "},
-        #     "th": {"class": "border-top border-bottom sticky"},
-        # }
-
     budget = CurrencyColumn(prefix="$")
     revenue = CurrencyColumn(prefix="$")
     runtime = RightAlignedColumn()
@@ -93,6 +88,7 @@ class MovieTableResponsive(tables.Table):
     selection = SelectionColumn()
     budget = CurrencyColumn(prefix="$")
     revenue = CurrencyColumn(prefix="$")
+    popularity = RightAlignedColumn()
     runtime = RightAlignedColumn()
 
 

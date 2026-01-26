@@ -59,7 +59,7 @@ docs = [
 [tool.uv.sources]
 django-flatpickr = { git="https://github.com/ianastewart/django-flatpickr.git", branch="master"}
 django-tableaux = { path = "C:/Users/is/PycharmProjects/django_tableaux", editable = true}
-django-tableaux = { path = "/home/ian/PycharmProjects/django_tableaux", editable = true}
+#django-tableaux = { path = "/home/ian/PycharmProjects/django_tableaux", editable = true}
 #
 [tool.uv.extra-build-dependencies]
 #demo-tables = ["uv.build"]
